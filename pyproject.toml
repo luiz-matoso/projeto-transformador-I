@@ -8,6 +8,8 @@ version = "0.1.0"
 description = "Ferramentas de dados e ML para o projeto de transitabilidade urbana"
 requires-python = ">=3.10"
 dependencies = [
+    "numpy>=1.26",
+    "opencv-python-headless>=4.10",
     "Pillow>=10",
     "PyYAML>=6.0",
     "streamlit>=1.39",
