@@ -1,0 +1,138 @@
+label,tipo_erro,arquivo,categoria_visual,observacao,confianca_analise
+construction,false_positive,construction/false_positive/01_sample-0044_p-0.6684.png,contexto_confuso,"cones próximos a poste sem obra claramente visível",media
+construction,false_positive,construction/false_positive/02_sample-0121_p-0.4985.png,possivel_anotacao_ambigua,"sinalização de obra cones e materiais presentes",alta - são placas de sinalização com cones, não há obra aprante, só se for a frente.
+construction,false_positive,construction/false_positive/03_sample-0231_p-0.4663.png,contexto_confuso,"veículo com escada sem obra claramente visível",media
+construction,false_positive,construction/false_positive/04_sample-0426_p-0.4418.png,contexto_confuso,"placa móvel e cones próximos à calçada",media
+construction,false_positive,construction/false_positive/05_sample-0050_p-0.4416.png,objeto_pequeno,"pequena sinalização laranja junto à esquina",media
+construction,false_positive,construction/false_positive/06_sample-0255_p-0.4310.png,contexto_confuso,"placas de jardim e bicicleta podem confundir a cena",media
+construction,false_positive,construction/false_positive/07_sample-0248_p-0.4129.png,possivel_anotacao_ambigua,"barreiras de obra visíveis na via",alta - apenas placas de sinalização, não há obra visivel, possível sinalização de obra
+construction,false_positive,construction/false_positive/08_sample-0228_p-0.4053.png,contexto_confuso,"sinalização viária e tráfego dominam a cena",media
+construction,false_positive,construction/false_positive/09_sample-0424_p-0.3740.png,outro,"não há evidência visual clara de obra",baixa - na verdade, é uma obra mas não da rua, o que mostra é alguns materiais de pintura e dois homens mais a dentro do que seria uma entrada para algo realizando a pintura, na frente há baldees de tinta.
+construction,false_positive,construction/false_positive/10_sample-0323_p-0.3736.png,contexto_confuso,"placa comercial móvel próxima à calçada",media
+construction,false_negative,construction/false_negative/01_sample-0221_p-0.0066.png,erro_modelo_claro,"obra com materiais e entulho claramente visíveis",alta
+construction,false_negative,construction/false_negative/02_sample-0196_p-0.0078.png,erro_modelo_claro,"entulho e materiais de obra junto à calçada",alta
+construction,false_negative,construction/false_negative/03_sample-0207_p-0.0110.png,erro_modelo_claro,"demolição e reparo visíveis na entrada",alta
+construction,false_negative,construction/false_negative/04_sample-0256_p-0.0153.png,oclusao,"obra cercada parcialmente encoberta por veículos",media
+construction,false_negative,construction/false_negative/05_sample-0118_p-0.0171.png,objeto_pequeno,"sinalização de obra pequena e distante",media
+construction,false_negative,construction/false_negative/06_sample-0415_p-0.0269.png,erro_modelo_claro,"calçada quebrada com intervenção visível",alta
+construction,false_negative,construction/false_negative/07_sample-0363_p-0.0367.png,objeto_pequeno,"cones e área de obra aparecem ao fundo",media
+construction,false_negative,construction/false_negative/08_sample-0029_p-0.0409.png,oclusao,"obra parcialmente encoberta por caminhão",media
+construction,false_negative,construction/false_negative/09_sample-0201_p-0.0444.png,erro_modelo_claro,"materiais e atividade de obra na fachada",alta
+construction,false_negative,construction/false_negative/10_sample-0036_p-0.0505.png,erro_modelo_claro,"canteiro e trabalhadores claramente visíveis",alta
+height-difference,false_positive,height-difference/false_positive/01_sample-0463_p-0.5015.png,classe_visualmente_plausivel,"transição inclinada entre garagem e calçada",media
+height-difference,false_positive,height-difference/false_positive/02_sample-0456_p-0.4938.png,classe_visualmente_plausivel,"rampa e meio-fio formam mudança de nível",media
+height-difference,false_positive,height-difference/false_positive/03_sample-0199_p-0.3384.png,possivel_anotacao_ambigua,"meio-fio e placas de piso em níveis distintos",alta - correto parcialemnte, podemos considerar sim. 
+height-difference,false_positive,height-difference/false_positive/04_sample-0201_p-0.3120.png,classe_visualmente_plausivel,"degrau e pavimento irregular junto à entrada",media
+height-difference,false_positive,height-difference/false_positive/05_sample-0215_p-0.3030.png,classe_visualmente_plausivel,"meio-fio separa calçada e rua",media
+height-difference,false_positive,height-difference/false_positive/06_sample-0216_p-0.3030.png,classe_visualmente_plausivel,"cena semelhante com meio-fio entre calçada e rua",media
+height-difference,false_positive,height-difference/false_positive/07_sample-0459_p-0.2697.png,classe_visualmente_plausivel,"desnível sutil entre acesso e via",media
+height-difference,false_positive,height-difference/false_positive/08_sample-0227_p-0.2511.png,possivel_anotacao_ambigua,"entulho e pavimento rompido formam desnível evidente",alta - na verdade, a calçada continua no nivel correto, só há um entulho que cobre parte junto com um poste ficando apertado para passar.
+height-difference,false_positive,height-difference/false_positive/09_sample-0203_p-0.2031.png,classe_visualmente_plausivel,"rampa de garagem e meio-fio visíveis",media
+height-difference,false_positive,height-difference/false_positive/10_sample-0448_p-0.2001.png,classe_visualmente_plausivel,"meio-fio e rampa amarela criam mudança de nível",media
+height-difference,false_negative,height-difference/false_negative/01_sample-0433_p-0.0422.png,erro_modelo_claro,"meio-fio e rampa apresentam mudança de nível visível",alta
+height-difference,false_negative,height-difference/false_negative/02_sample-0213_p-0.0586.png,contexto_confuso,"mudança de nível é sutil na borda da calçada",media
+height-difference,false_negative,height-difference/false_negative/03_sample-0178_p-0.0717.png,objeto_pequeno,"desnível aparece distante no acesso à calçada",media
+height-difference,false_negative,height-difference/false_negative/04_sample-0438_p-0.1355.png,erro_modelo_claro,"degrau de entrada claramente visível",alta
+height-difference,false_negative,height-difference/false_negative/05_sample-0378_p-0.1625.png,contexto_confuso,"escada rebaixada fica fora do trajeto principal",media
+height-difference,false_negative,height-difference/false_negative/06_sample-0430_p-0.1762.png,objeto_pequeno,"meio-fio parcialmente distante junto ao veículo",media
+height-difference,false_negative,height-difference/false_negative/07_sample-0207_p-0.1827.png,erro_modelo_claro,"pavimento quebrado e desnível claramente visíveis",alta
+parked-car,false_positive,parked-car/false_positive/01_sample-0469_p-0.9546.png,possivel_anotacao_ambigua,"vários veículos aparentemente estacionados",alta - sim, dois que atrapalham ali a calcçada e outros estacionados.
+parked-car,false_positive,parked-car/false_positive/02_sample-0256_p-0.9332.png,possivel_anotacao_ambigua,"veículo parado junto ao meio-fio",alta - não, todos estão escionados na rua, nada no meio fio.
+parked-car,false_positive,parked-car/false_positive/03_sample-0443_p-0.8524.png,possivel_anotacao_ambigua,"diversos veículos estacionados ao longo da rua",alta - vários carros estacionados ao longo da rua, correto.
+parked-car,false_positive,parked-car/false_positive/04_sample-0118_p-0.8064.png,possivel_anotacao_ambigua,"vários veículos estacionados nas duas laterais",alta - mesma coisa, vários carros estacionados na rua.
+parked-car,false_positive,parked-car/false_positive/05_sample-0257_p-0.7978.png,possivel_anotacao_ambigua,"veículo estacionado parcialmente sobre a calçada",alta - carro estacionado na rua, nada na calçada.
+parked-car,false_positive,parked-car/false_positive/06_sample-0451_p-0.7394.png,possivel_anotacao_ambigua,"veículo estacionado junto à calçada",alta - carros estacionados na rua, perto da calçada, mas não sobre ela.
+parked-car,false_positive,parked-car/false_positive/07_sample-0224_p-0.7092.png,possivel_anotacao_ambigua,"veículo estacionado claramente visível",alta - sim, normal estacionado na rua.
+parked-car,false_positive,parked-car/false_positive/08_sample-0418_p-0.5973.png,possivel_anotacao_ambigua,"veículo parado junto ao meio-fio",alta - novamente, parado perto da calçada, mas não sobre ela, está na rua.
+parked-car,false_positive,parked-car/false_positive/09_sample-0001_p-0.4829.png,possivel_anotacao_ambigua,"veículos aparentemente estacionados nas laterais",alta - mesma coisa, estacionados na rua, não sobre a calçada.
+parked-car,false_positive,parked-car/false_positive/10_sample-0170_p-0.4595.png,contexto_confuso,"veículo em primeiro plano sem estado estacionado evidente",media
+parked-car,false_negative,parked-car/false_negative/01_sample-0043_p-0.0042.png,oclusao,"veículo aparece parcialmente cortado na borda esquerda",alta
+parked-car,false_negative,parked-car/false_negative/02_sample-0255_p-0.0058.png,objeto_pequeno,"veículo estacionado pequeno e distante à direita",media
+parked-car,false_negative,parked-car/false_negative/03_sample-0222_p-0.0147.png,objeto_pequeno,"veículo pequeno ao fundo da via",media
+parked-car,false_negative,parked-car/false_negative/04_sample-0311_p-0.0170.png,objeto_pequeno,"veículos estacionados distantes",media
+parked-car,false_negative,parked-car/false_negative/05_sample-0219_p-0.0202.png,oclusao,"veículo cortado pela borda esquerda da imagem",alta
+parked-car,false_negative,parked-car/false_negative/06_sample-0082_p-0.0525.png,outro,"imagem sem conteúdo visual utilizável",baixa - imagem preta.
+parked-car,false_negative,parked-car/false_negative/07_sample-0081_p-0.0931.png,contexto_confuso,"há veículos mas o estado estacionado não é evidente",media
+parked-car,false_negative,parked-car/false_negative/08_sample-0031_p-0.1158.png,erro_modelo_claro,"vários veículos estacionados claramente visíveis",alta
+parked-car,false_negative,parked-car/false_negative/09_sample-0076_p-0.1413.png,erro_modelo_claro,"caminhonete estacionada junto ao meio-fio",alta
+parked-car,false_negative,parked-car/false_negative/10_sample-0063_p-0.1713.png,erro_modelo_claro,"veículo estacionado claramente visível",alta
+pole,false_positive,pole/false_positive/01_sample-0144_p-0.9771.png,possivel_anotacao_ambigua,"diversos balizadores verticais visíveis",alta - aqui já é um caso de balizadores, não postes, então a anotação está correta.
+pole,false_positive,pole/false_positive/02_sample-0226_p-0.9011.png,contexto_confuso,"tubulação vertical junto à fachada lembra um poste",media
+pole,false_positive,pole/false_positive/03_sample-0138_p-0.8877.png,classe_visualmente_plausivel,"grande coluna vertical na entrada do túnel",media
+pole,false_positive,pole/false_positive/04_sample-0206_p-0.8776.png,contexto_confuso,"tronco de árvore ocupa a posição típica de poste",alta
+pole,false_positive,pole/false_positive/05_sample-0218_p-0.8732.png,objeto_pequeno,"diversos postes finos aparecem ao fundo",media
+pole,false_positive,pole/false_positive/06_sample-0342_p-0.7295.png,classe_visualmente_plausivel,"poste de sinalização junto à calçada",alta
+pole,false_positive,pole/false_positive/07_sample-0134_p-0.7166.png,classe_visualmente_plausivel,"poste de sinalização visto pelo verso",alta
+pole,false_positive,pole/false_positive/08_sample-0247_p-0.6917.png,classe_visualmente_plausivel,"elemento vertical listrado junto ao meio-fio",media
+pole,false_positive,pole/false_positive/09_sample-0383_p-0.5962.png,possivel_anotacao_ambigua,"postes de semáforo claramente visíveis",alta - postes, balizadores, placas, várias coisas.
+pole,false_positive,pole/false_positive/10_sample-0169_p-0.5815.png,classe_visualmente_plausivel,"poste de sinalização no centro da calçada",alta
+pole,false_negative,pole/false_negative/01_sample-0199_p-0.0081.png,erro_modelo_claro,"poste fino claramente visível no primeiro plano",alta
+pole,false_negative,pole/false_negative/02_sample-0400_p-0.0091.png,objeto_pequeno,"poste de sinalização pequeno à direita",media
+pole,false_negative,pole/false_negative/03_sample-0468_p-0.0119.png,erro_modelo_claro,"poste de sinalização visível junto ao muro",alta
+pole,false_negative,pole/false_negative/04_sample-0249_p-0.0209.png,outro,"não há evidência visual clara de poste",baixa - tem sem um poste, ele bem cortado, o que mais aparece são carros na rua e em um estacionamento, de fato há um psote mas não interfere na transitabilidade.
+pole,false_negative,pole/false_negative/05_sample-0147_p-0.0221.png,oclusao,"elemento vertical distante e imagem parcialmente borrada",baixa - correto
+pole,false_negative,pole/false_negative/06_sample-0027_p-0.0275.png,objeto_pequeno,"poste de serviço pequeno ao fundo",media
+pole,false_negative,pole/false_negative/07_sample-0149_p-0.0294.png,erro_modelo_claro,"poste inclinado claramente visível na calçada",alta
+pole,false_negative,pole/false_negative/08_sample-0224_p-0.0304.png,oclusao,"poste parcialmente encoberto por árvore e veículo",media
+pole,false_negative,pole/false_negative/09_sample-0216_p-0.0460.png,erro_modelo_claro,"poste alto e fino claramente visível",alta
+pole,false_negative,pole/false_negative/10_sample-0398_p-0.0470.png,outro,"não há evidência visual clara de poste",baixa - correto
+trash-recycling-can,false_positive,trash-recycling-can/false_positive/01_sample-0297_p-0.9778.png,possivel_anotacao_ambigua,"lixeiras verdes e recipiente escuro visíveis",alta - correto.
+trash-recycling-can,false_positive,trash-recycling-can/false_positive/02_sample-0147_p-0.8708.png,classe_visualmente_plausivel,"lixeiras visíveis apesar de borramento parcial",media
+trash-recycling-can,false_positive,trash-recycling-can/false_positive/03_sample-0198_p-0.8687.png,possivel_anotacao_ambigua,"sacos de lixo e recipiente azul visíveis",alta - correto.
+trash-recycling-can,false_positive,trash-recycling-can/false_positive/04_sample-0321_p-0.8579.png,possivel_anotacao_ambigua,"várias lixeiras alinhadas junto à garagem",alta - correto
+trash-recycling-can,false_positive,trash-recycling-can/false_positive/05_sample-0056_p-0.6519.png,possivel_anotacao_ambigua,"duas lixeiras claramente visíveis",alta - correto mas são 3.
+trash-recycling-can,false_positive,trash-recycling-can/false_positive/06_sample-0040_p-0.6430.png,possivel_anotacao_ambigua,"lixeiras ao lado de sinalização de calçada fechada",alta - correto, essas ainda que não estão atrapalhando a calçada pois estão mais na grama que na calçada, o que chama atenção é uma placa escrito SIDEWALK CLODESED e uma obra a frente na própria calçada.
+trash-recycling-can,false_positive,trash-recycling-can/false_positive/07_sample-0397_p-0.6365.png,possivel_anotacao_ambigua,"lixeiras junto à entrada da residência",alta - correto, bem na entrada, nem atrapalham calçada.
+trash-recycling-can,false_positive,trash-recycling-can/false_positive/08_sample-0242_p-0.6058.png,possivel_anotacao_ambigua,"contêiner e caixas claramente visíveis",alta - sim, mas ainda é mais interferido pela construção/obra.
+trash-recycling-can,false_positive,trash-recycling-can/false_positive/09_sample-0360_p-0.5452.png,classe_visualmente_plausivel,"pequenos recipientes de reciclagem junto ao meio-fio",alta
+trash-recycling-can,false_positive,trash-recycling-can/false_positive/10_sample-0031_p-0.5259.png,classe_visualmente_plausivel,"lixeira verde visível na borda esquerda",alta
+trash-recycling-can,false_negative,trash-recycling-can/false_negative/01_sample-0224_p-0.0058.png,oclusao,"recipiente pequeno parcialmente encoberto por árvore e poste",baixa - correto
+trash-recycling-can,false_negative,trash-recycling-can/false_negative/02_sample-0402_p-0.0061.png,objeto_pequeno,"lixeira pequena e distante no canto superior direito",alta
+trash-recycling-can,false_negative,trash-recycling-can/false_negative/03_sample-0140_p-0.0182.png,objeto_pequeno,"recipiente pequeno junto ao canal",media
+trash-recycling-can,false_negative,trash-recycling-can/false_negative/04_sample-0454_p-0.0199.png,oclusao,"saco ou recipiente encoberto por poste e entrada",media
+trash-recycling-can,false_negative,trash-recycling-can/false_negative/05_sample-0448_p-0.0219.png,erro_modelo_claro,"cesto metálico claramente visível na calçada",alta
+trash-recycling-can,false_negative,trash-recycling-can/false_negative/06_sample-0197_p-0.0245.png,objeto_pequeno,"recipiente marrom pequeno junto ao muro",media
+trash-recycling-can,false_negative,trash-recycling-can/false_negative/07_sample-0389_p-0.0261.png,erro_modelo_claro,"papelão e resíduos acumulados claramente visíveis",alta
+trash-recycling-can,false_negative,trash-recycling-can/false_negative/08_sample-0357_p-0.0265.png,objeto_pequeno,"lixeira pequena ao lado do recipiente azul",media
+trash-recycling-can,false_negative,trash-recycling-can/false_negative/09_sample-0257_p-0.0403.png,erro_modelo_claro,"lixeira preta claramente visível ao lado do carro",alta
+trash-recycling-can,false_negative,trash-recycling-can/false_negative/10_sample-0418_p-0.0421.png,oclusao,"lixeira verde parcialmente encoberta pelo veículo",alta
+tree,false_positive,tree/false_positive/01_sample-0187_p-0.9974.png,possivel_anotacao_ambigua,"troncos de árvores claramente visíveis",alta - correto.
+tree,false_positive,tree/false_positive/02_sample-0197_p-0.9826.png,classe_visualmente_plausivel,"copa e galhos de árvore ocupam a parte superior",media
+tree,false_positive,tree/false_positive/03_sample-0222_p-0.9133.png,possivel_anotacao_ambigua,"várias árvores visíveis nas duas laterais",alta - correto
+tree,false_positive,tree/false_positive/04_sample-0219_p-0.6870.png,contexto_confuso,"apenas sombras e partes periféricas de árvores visíveis",media
+tree,false_positive,tree/false_positive/05_sample-0190_p-0.5774.png,possivel_anotacao_ambigua,"árvores alinhadas ao longo da rua",alta - corretro, tem várias nas calçadas.
+tree,false_positive,tree/false_positive/06_sample-0442_p-0.5443.png,possivel_anotacao_ambigua,"árvores e copas claramente visíveis",alta - é, mas tem mais poste na verdade, tem árvore tbm ok
+tree,false_positive,tree/false_positive/07_sample-0431_p-0.5358.png,possivel_anotacao_ambigua,"árvore grande visível à direita",alta - correto.
+tree,false_positive,tree/false_positive/08_sample-0455_p-0.5162.png,oclusao,"copa projetada sobre a cena com tronco fora do enquadramento",media
+tree,false_positive,tree/false_positive/09_sample-0456_p-0.5136.png,classe_visualmente_plausivel,"árvores visíveis do outro lado da via",media
+tree,false_positive,tree/false_positive/10_sample-0348_p-0.4837.png,classe_visualmente_plausivel,"árvores sem folhas visíveis ao fundo",media
+tree,false_negative,tree/false_negative/01_sample-0342_p-0.0101.png,erro_modelo_claro,"árvore sem folhas claramente visível junto à calçada",alta
+tree,false_negative,tree/false_negative/02_sample-0324_p-0.0136.png,oclusao,"árvore aparece apenas parcialmente na borda esquerda",baixa - é, na verdade a maioria entraria como vegetação pq é um amontoado de verde e algumas arvores pequenas.
+tree,false_negative,tree/false_negative/03_sample-0361_p-0.0152.png,oclusao,"copa densa sem tronco claramente distinguível",baixa - entraria vegetação tbm, n tem tronco visivel
+tree,false_negative,tree/false_negative/04_sample-0371_p-0.0337.png,objeto_pequeno,"árvores pequenas e distantes ao fundo",baixa - sim, apenas ao fundo, no predominanme seria vegetação
+tree,false_negative,tree/false_negative/05_sample-0364_p-0.0382.png,erro_modelo_claro,"várias árvores grandes claramente visíveis",alta
+tree,false_negative,tree/false_negative/06_sample-0346_p-0.0398.png,erro_modelo_claro,"árvore grande ocupa o centro da cena",alta
+tree,false_negative,tree/false_negative/07_sample-0443_p-0.0473.png,erro_modelo_claro,"árvores alinhadas ao longo da rua",alta
+tree,false_negative,tree/false_negative/08_sample-0108_p-0.0523.png,oclusao,"tronco parcialmente cortado pela borda direita",alta
+tree,false_negative,tree/false_negative/09_sample-0217_p-0.0649.png,oclusao,"copa visível mas tronco encoberto pelo enquadramento",media
+tree,false_negative,tree/false_negative/10_sample-0206_p-0.0787.png,erro_modelo_claro,"tronco de árvore claramente visível no centro",alta
+vegetation,false_positive,vegetation/false_positive/01_sample-0363_p-0.9955.png,possivel_anotacao_ambigua,"gramado arbustos e árvores claramente visíveis",alta - correto, mas deveria ser classificado como Tree.
+vegetation,false_positive,vegetation/false_positive/02_sample-0366_p-0.9954.png,possivel_anotacao_ambigua,"gramado e arbustos claramente visíveis",alta - correto mas deveria ser como tree.
+vegetation,false_positive,vegetation/false_positive/03_sample-0402_p-0.9870.png,possivel_anotacao_ambigua,"sebe e vegetação rasteira claramente visíveis",alta - correto.
+vegetation,false_positive,vegetation/false_positive/04_sample-0346_p-0.9716.png,possivel_anotacao_ambigua,"arbusto grande e gramado visíveis",alta - correto.
+vegetation,false_positive,vegetation/false_positive/05_sample-0161_p-0.9573.png,possivel_anotacao_ambigua,"jardim e vegetação abundante visíveis",alta - +-, devferia ser umn tree e tal, flores são bem inofensivas nessa foto, não seria de fato uma vegetação.
+vegetation,false_positive,vegetation/false_positive/06_sample-0089_p-0.9375.png,possivel_anotacao_ambigua,"sebe densa ocupa grande parte da cena",alta - correto + poste.
+vegetation,false_positive,vegetation/false_positive/07_sample-0364_p-0.9272.png,possivel_anotacao_ambigua,"gramados arbustos e árvores dominam a cena",alta - correto.
+vegetation,false_positive,vegetation/false_positive/08_sample-0415_p-0.8920.png,classe_visualmente_plausivel,"faixa de grama e vegetação junto à obra",media
+vegetation,false_positive,vegetation/false_positive/09_sample-0275_p-0.8803.png,possivel_anotacao_ambigua,"canteiro com arbustos claramente visível",alta - correto.
+vegetation,false_positive,vegetation/false_positive/10_sample-0178_p-0.8775.png,possivel_anotacao_ambigua,"gramado e vegetação ao redor do prédio",alta - correto, só grama normal tmb
+vegetation,false_negative,vegetation/false_negative/01_sample-0036_p-0.0028.png,contexto_confuso,"vegetação lateral presente mas construção domina a cena",media
+vegetation,false_negative,vegetation/false_negative/02_sample-0194_p-0.0116.png,objeto_pequeno,"vegetação rasteira pequena junto ao meio-fio",alta
+vegetation,false_negative,vegetation/false_negative/03_sample-0018_p-0.0121.png,erro_modelo_claro,"sebe extensa claramente visível à esquerda",alta
+vegetation,false_negative,vegetation/false_negative/04_sample-0314_p-0.0138.png,erro_modelo_claro,"grama e vegetação ao longo da calçada",alta
+vegetation,false_negative,vegetation/false_negative/05_sample-0157_p-0.0142.png,erro_modelo_claro,"canteiro e plantas claramente visíveis",alta
+vegetation,false_negative,vegetation/false_negative/06_sample-0169_p-0.0150.png,objeto_pequeno,"vegetação pequena junto à fachada",media
+vegetation,false_negative,vegetation/false_negative/07_sample-0193_p-0.0243.png,objeto_pequeno,"vegetação rasteira pequena junto ao muro",alta
+vegetation,false_negative,vegetation/false_negative/08_sample-0069_p-0.0331.png,objeto_pequeno,"arbustos pequenos junto à ferrovia",media
+vegetation,false_negative,vegetation/false_negative/09_sample-0092_p-0.0392.png,objeto_pequeno,"vegetação esparsa junto à cerca",media
+vegetation,false_negative,vegetation/false_negative/10_sample-0185_p-0.0479.png,objeto_pequeno,"faixa estreita de grama e plantas junto ao muro",alta

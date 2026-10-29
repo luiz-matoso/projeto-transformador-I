@@ -1,0 +1,42 @@
+/* Layout de produtividade: seletores por key evitam depender da árvore interna. */
+.block-container { max-width: 1880px; padding-top: 4rem; padding-bottom: 1rem; }
+[data-testid="stColumn"]:has(.st-key-sticky_image_panel) {
+  position: sticky; top: 4rem; align-self: flex-start; z-index: 10;
+}
+.st-key-sticky_image_panel {
+  max-height: calc(100vh - 5rem); overflow: hidden;
+}
+.st-key-sticky_image_panel img {
+  display: block; width: 100%; max-height: calc(100vh - 16rem);
+  object-fit: contain; object-position: center;
+}
+[data-testid="stLayoutWrapper"]:has(> .st-key-sticky_actions) {
+  position: sticky; top: 4rem; z-index: 20; background: Canvas;
+}
+.st-key-sticky_actions {
+  padding: 0.35rem 0 0.45rem;
+  margin-bottom: 0.35rem; border-bottom: 1px solid color-mix(in srgb, CanvasText 20%, transparent);
+  background: Canvas;
+}
+[class*="st-key-field_group_"] {
+  margin-top: 0.2rem; padding-top: 0.15rem;
+  border-top: 1px solid color-mix(in srgb, CanvasText 13%, transparent);
+}
+[class*="st-key-field_header_"] { min-height: 2rem; }
+.st-key-original_metadata {
+  padding: 0.55rem 0.7rem; margin: 0.15rem 0 0.35rem;
+  border: 1px solid color-mix(in srgb, #00aeef 35%, transparent);
+  border-radius: 0.55rem;
+  background: color-mix(in srgb, #00aeef 7%, Canvas);
+}
+.st-key-original_metadata p { margin-bottom: 0.15rem; font-size: 0.88rem; }
+div[data-testid="stForm"] { border: 0; padding: 0; }
+div[data-testid="stVerticalBlock"] { gap: 0.45rem; }
+div[data-testid="stPills"] p,
+div[data-testid="stCheckbox"] p,
+div[data-testid="stButton"] p { font-size: 0.92rem; }
+@media (max-width: 900px) {
+  [data-testid="stColumn"]:has(.st-key-sticky_image_panel) { position: static; }
+  .st-key-sticky_image_panel { max-height: none; }
+  .st-key-sticky_image_panel img { max-height: 55vh; }
+}

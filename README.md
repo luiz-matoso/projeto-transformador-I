@@ -62,3 +62,50 @@ Após a validação do MVP, algumas evoluções possíveis incluem:
 ## Estado atual
 
 O projeto está em fase de definição e validação inicial. O foco atual está na delimitação do MVP, seleção das barreiras consideradas, definição dos critérios de transitabilidade, escolha dos datasets e estudo das abordagens de visão computacional que poderão ser utilizadas.
+
+## Ferramenta local de anotação
+
+A infraestrutura de anotação do protótipo final fica em
+`tools/annotation_app/`. Ela carrega as labels de
+`annotations/annotation-schema.yaml` e funciona com qualquer diretório local de
+imagens, mesmo quando somente o subset `Obstacle` está disponível.
+
+Após instalar o projeto com `python -m pip install -e .`, execute:
+
+```bash
+python -m streamlit run tools/annotation_app/app.py
+```
+
+Instruções de uso, persistência e formato do CSV estão em
+`tools/annotation_app/README.md`. O manual de decisão das labels está em
+`annotations/annotation-guidelines.md`.
+
+## Segmentação da faixa de circulação
+
+O primeiro componente do pipeline final segmenta `circulation_path` como uma
+máscara binária com SegFormer-B0 inicializado a partir de
+`nvidia/segformer-b0-finetuned-cityscapes-1024-1024`. Antes de qualquer treino,
+execute o QA estrutural e visual:
+
+```bash
+python -m ml.segmentation.qa
+```
+
+O relatório fica em `artifacts/segmentation/dataset_qa.md` e os previews em
+`artifacts/segmentation/qa_overlays/`. O treino recusa automaticamente CSVs com
+status diferente de `annotated`, geometria inválida, imagem ausente ou dimensões
+incompatíveis:
+
+```bash
+python -m ml.segmentation.train
+```
+
+Quando houver um checkpoint treinado, a inferência em imagem arbitrária será:
+
+```bash
+python -m ml.segmentation.predict --image caminho/para/imagem.png
+```
+
+O split próprio é congelado em 75 imagens de treino, 15 de validação e 15 de
+teste com seed 42. Panoramas são mantidos em um único split, e o teste só é
+avaliado depois da escolha do checkpoint por foreground IoU na validação.

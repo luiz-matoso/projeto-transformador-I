@@ -9,10 +9,14 @@ description = "Ferramentas de dados e ML para o projeto de transitabilidade urba
 requires-python = ">=3.10"
 dependencies = [
     "Pillow>=10",
+    "PyYAML>=6.0",
+    "streamlit>=1.39",
+    "streamlit-drawable-canvas==0.13.0",
     "torch>=2.2",
     "torchvision>=0.17",
+    "transformers>=4.57",
 ]
 
 [tool.setuptools.packages.find]
-include = ["ml*"]
+include = ["ml*", "tools*"]
 

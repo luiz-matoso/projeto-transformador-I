@@ -1,5 +1,33 @@
-/data/
+# Raw datasets and extracted/generated images stay local. Keep the small,
+# reproducible annotation-pilot metadata visible to Git.
+/data/*
+!/data/annotation-pilot/
+/data/annotation-pilot/*
+!/data/annotation-pilot/pilot_manifest.csv
+!/data/annotation-pilot/pilot_summary.md
+
+# Local environments and Python/tool caches.
 .venv/
 __pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+/tmp*/
+
+# Model weights and checkpoints.
 *.pt
 *.pth
+*.ckpt
+*.safetensors
+
+# Reproducible visual outputs; keep CSV/JSON/Markdown reports visible.
+/artifacts/**/*.png
+/artifacts/**/*.jpg
+/artifacts/**/*.jpeg
+/artifacts/segmentation/image_processor/
+
+# Local execution logs.
+*.log
