@@ -8,7 +8,9 @@ import tempfile
 import unittest
 from collections import Counter, defaultdict
 from pathlib import Path
+from types import SimpleNamespace
 
+import numpy as np
 import torch
 from PIL import Image
 
@@ -21,6 +23,13 @@ from ml.segmentation.dataset import (
     parse_polygons,
     rasterize_polygons,
     resize_binary_mask,
+)
+from ml.segmentation.predict import (
+    SegformerPredictor,
+    mask_to_normalized_polygons,
+    predict_circulation_path,
+    read_segformer_checkpoint,
+    remove_small_components,
 )
 
 
@@ -48,6 +57,73 @@ class SegmentationDatasetTests(unittest.TestCase):
         resized = resize_binary_mask(mask, (17, 19))
         self.assertEqual(resized.size, (17, 19))
         self.assertLessEqual(set(resized.tobytes()), {0, 1})
+
+    def test_real_checkpoint_metadata_can_be_loaded_on_cpu(self) -> None:
+        checkpoint = read_segformer_checkpoint(
+            Path("artifacts/segmentation/best_segformer.pt"), map_location="cpu"
+        )
+        self.assertEqual(checkpoint["image_size"], 512)
+        self.assertEqual(checkpoint["id2label"][1], "circulation_path")
+
+    def test_small_component_is_removed_but_relevant_components_are_preserved(self) -> None:
+        mask = np.zeros((100, 100), dtype=np.uint8)
+        mask[10:40, 10:40] = 1
+        mask[55:85, 55:90] = 1
+        mask[2:4, 2:4] = 1
+        cleaned = remove_small_components(mask, min_area_pixels=20, min_area_ratio=0)
+        self.assertEqual(int(cleaned[2:4, 2:4].sum()), 0)
+        self.assertGreater(int(cleaned[10:40, 10:40].sum()), 0)
+        self.assertGreater(int(cleaned[55:85, 55:90].sum()), 0)
+
+    def test_mask_becomes_simplified_normalized_polygons(self) -> None:
+        mask = np.zeros((120, 160), dtype=np.uint8)
+        cv_points = np.array([[10, 110], [30, 20], [80, 8], [145, 30], [150, 112]])
+        import cv2
+
+        cv2.fillPoly(mask, [cv_points], 1)
+        polygons = mask_to_normalized_polygons(mask, min_area_pixels=1)
+        self.assertEqual(len(polygons), 1)
+        self.assertGreaterEqual(len(polygons[0]), 3)
+        self.assertLess(len(polygons[0]), 30)
+        self.assertTrue(
+            all(0 <= coordinate <= 1 for point in polygons[0] for coordinate in point)
+        )
+
+    def test_mocked_cpu_inference_returns_editable_polygon(self) -> None:
+        class Processor:
+            def __call__(self, **kwargs):
+                del kwargs
+                return {"pixel_values": torch.zeros((1, 3, 16, 16))}
+
+        class Model:
+            def __call__(self, *, pixel_values):
+                del pixel_values
+                logits = torch.full((1, 2, 16, 16), -4.0)
+                logits[:, 0] = 4.0
+                logits[:, 0, 4:14, 3:13] = -4.0
+                logits[:, 1, 4:14, 3:13] = 4.0
+                return SimpleNamespace(logits=logits)
+
+        predictor = SegformerPredictor(
+            model=Model(),
+            processor=Processor(),
+            device=torch.device("cpu"),
+            image_size=16,
+            checkpoint_path=Path("fixture.pt"),
+        )
+        suggestion = predict_circulation_path(
+            predictor, Image.new("RGB", (64, 48), "white")
+        )
+        self.assertEqual(suggestion.mask.shape, (48, 64))
+        self.assertTrue(suggestion.polygons)
+        self.assertTrue(
+            all(
+                0 <= coordinate <= 1
+                for polygon in suggestion.polygons
+                for point in polygon
+                for coordinate in point
+            )
+        )
 
     def test_polygon_parser_rejects_missing_points_and_out_of_range(self) -> None:
         self.assertEqual(len(parse_polygons("[[[0,0],[1,0],[0,1]]]")), 1)

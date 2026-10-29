@@ -100,7 +100,8 @@ incompatíveis:
 python -m ml.segmentation.train
 ```
 
-Quando houver um checkpoint treinado, a inferência em imagem arbitrária será:
+O checkpoint v1 treinado fica em `artifacts/segmentation/best_segformer.pt`.
+A inferência em imagem arbitrária é executada com:
 
 ```bash
 python -m ml.segmentation.predict --image caminho/para/imagem.png
@@ -109,3 +110,8 @@ python -m ml.segmentation.predict --image caminho/para/imagem.png
 O split próprio é congelado em 75 imagens de treino, 15 de validação e 15 de
 teste com seed 42. Panoramas são mantidos em um único split, e o teste só é
 avaliado depois da escolha do checkpoint por foreground IoU na validação.
+
+O mesmo checkpoint está integrado ao annotation tool como assistente opcional.
+Em imagens pendentes, **Gerar sugestão SegFormer** preenche o editor de polygon;
+o anotador pode corrigir, restaurar ou limpar a previsão. Nada é persistido até
+o save humano, e anotações existentes nunca recebem inferência automaticamente.
