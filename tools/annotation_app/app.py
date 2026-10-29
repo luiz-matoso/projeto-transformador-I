@@ -18,7 +18,6 @@ from tools.annotation_app.core import (
     discover_images,
     load_annotations,
     load_schema,
-    migrate_annotation_file_v1_to_v2,
     save_annotation,
 )
 from tools.annotation_app.original_metadata import (
@@ -38,6 +37,11 @@ from tools.annotation_app.spatial import (
     fabric_json_to_circulation_path,
     fit_canvas_size,
 )
+from tools.annotation_app.suggestions import (
+    annotation_origin,
+    annotation_state,
+    should_offer_suggestion,
+)
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -46,6 +50,8 @@ GUIDELINES_PATH = SCHEMA_PATH.parent / "annotation-guidelines.md"
 STYLE_PATH = Path(__file__).with_name("style.css")
 DEFAULT_IMAGE_DIRECTORY = PROJECT_ROOT / "data" / "obstacles" / "crops"
 DEFAULT_ANNOTATION_CSV = PROJECT_ROOT / "annotations" / "transitability_annotations.csv"
+SEGFORMER_CHECKPOINT = PROJECT_ROOT / "artifacts" / "segmentation" / "best_segformer.pt"
+SEGMENTATION_SPLITS = PROJECT_ROOT / "artifacts" / "segmentation" / "splits.csv"
 EMPTY_SENTINEL = "__explicit_empty__"
 SPATIAL_STATUS_LABELS = {
     "annotated": "Identificada",
@@ -79,18 +85,59 @@ def original_image_size(path: str, modified_ns: int) -> tuple[int, int]:
         return image.size
 
 
+@st.cache_resource(show_spinner=False)
+def cached_segformer_predictor(checkpoint_path: str, modified_ns: int):
+    """Carrega uma única instância por checkpoint durante a sessão Streamlit."""
+
+    del modified_ns
+    from ml.segmentation.predict import load_segformer_predictor
+
+    return load_segformer_predictor(checkpoint_path)
+
+
+@st.cache_data(show_spinner=False)
+def frozen_test_filenames(path: str, modified_ns: int) -> frozenset[str]:
+    del modified_ns
+    import csv
+
+    with Path(path).open("r", encoding="utf-8-sig", newline="") as handle:
+        return frozenset(
+            row["filename"]
+            for row in csv.DictReader(handle)
+            if row.get("split") == "test"
+        )
+
+
 def filter_images(
     images: tuple[ImageItem, ...],
     annotations: dict[str, dict[str, Any]],
     filter_name: str,
     annotation_keys: dict[str, str] | None = None,
+    original_metadata: dict[str, OriginalMetadata] | None = None,
+    subset: str = "all",
 ) -> tuple[ImageItem, ...]:
     keys = annotation_keys or {}
+    metadata = original_metadata or {}
     annotation_key = lambda image: keys.get(image.filename, image.filename)
+    if subset != "all":
+        images = tuple(
+            image
+            for image in images
+            if metadata.get(image.filename)
+            and metadata[image.filename].subset == subset
+        )
     if filter_name == "unannotated":
-        return tuple(image for image in images if annotation_key(image) not in annotations)
+        return tuple(
+            image
+            for image in images
+            if annotation_state(annotation_key(image), annotations) == "pending"
+        )
     if filter_name == "annotated":
-        return tuple(image for image in images if annotation_key(image) in annotations)
+        return tuple(
+            image
+            for image in images
+            if annotation_state(annotation_key(image), annotations) == "annotated"
+        )
     if filter_name == "low_confidence":
         return tuple(
             image
@@ -114,10 +161,13 @@ def initialize_state() -> None:
         "editing_filename": None,
         "filter_name": "all",
         "filter_label": "Todas",
+        "subset_filter": "all",
         "image_directory_input": str(DEFAULT_IMAGE_DIRECTORY),
         "annotation_csv_input": str(DEFAULT_ANNOTATION_CSV),
         "recursive_input": True,
         "notice": None,
+        "segformer_suggestions": {},
+        "segformer_generated": set(),
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -242,8 +292,90 @@ def render_spatial_panel(
     draft_key = f"{base_key}_draft"
     saved_status = existing.get("circulation_path_status") if existing else None
     saved_geometry = existing.get("circulation_path", ()) if existing else ()
+    reset_key = f"{base_key}_reset_revision"
+    editor_geometry_key = f"{base_key}_editor_geometry"
+    suggestion_key = (
+        st.session_state.dataset_token,
+        current_image.filename,
+    )
+    suggestion = st.session_state.segformer_suggestions.get(suggestion_key)
+    if reset_key not in st.session_state:
+        st.session_state[reset_key] = 0
+    if editor_geometry_key not in st.session_state:
+        st.session_state[editor_geometry_key] = saved_geometry
 
     st.caption("FAIXA DE CIRCULAÇÃO")
+    if should_offer_suggestion(existing, is_editing=is_editing):
+        generate_column, restore_column, clear_column = st.columns(3)
+        checkpoint_available = SEGFORMER_CHECKPOINT.is_file()
+        with generate_column:
+            generate_clicked = st.button(
+                "Gerar sugestão SegFormer",
+                disabled=not checkpoint_available,
+                width="stretch",
+                key=f"{base_key}_generate_suggestion",
+            )
+        with restore_column:
+            restore_clicked = st.button(
+                "Restaurar sugestão",
+                disabled=suggestion is None,
+                width="stretch",
+                key=f"{base_key}_restore_suggestion",
+            )
+        with clear_column:
+            clear_clicked = st.button(
+                "Limpar",
+                width="stretch",
+                key=f"{base_key}_clear_geometry",
+            )
+        if not checkpoint_available:
+            st.caption(
+                "SegFormer indisponível: checkpoint não encontrado. "
+                "A anotação manual continua disponível."
+            )
+        if generate_clicked:
+            try:
+                from ml.segmentation.predict import predict_circulation_path
+
+                predictor = cached_segformer_predictor(
+                    str(SEGFORMER_CHECKPOINT),
+                    SEGFORMER_CHECKPOINT.stat().st_mtime_ns,
+                )
+                with Image.open(current_image.path) as source:
+                    generated = predict_circulation_path(
+                        predictor, source.convert("RGB")
+                    )
+                if not generated.polygons:
+                    raise ValueError("o modelo não produziu uma região editável")
+            except Exception as error:
+                st.error(
+                    "Não foi possível gerar a sugestão. "
+                    f"A anotação manual permanece disponível: {error}"
+                )
+            else:
+                st.session_state.segformer_suggestions[suggestion_key] = generated.polygons
+                st.session_state.segformer_generated.add(suggestion_key)
+                st.session_state[editor_geometry_key] = generated.polygons
+                st.session_state[status_key] = "annotated"
+                st.session_state[reset_key] += 1
+                st.session_state.notice = (
+                    "Sugestão SegFormer gerada em "
+                    f"{generated.inference_seconds:.2f}s; revise antes de salvar."
+                )
+                st.rerun()
+        if restore_clicked and suggestion is not None:
+            st.session_state[editor_geometry_key] = suggestion
+            st.session_state[status_key] = "annotated"
+            st.session_state[reset_key] += 1
+            st.rerun()
+        if clear_clicked:
+            st.session_state[editor_geometry_key] = ()
+            st.session_state[reset_key] += 1
+            st.rerun()
+        if suggestion is not None:
+            st.info(
+                "SegFormer v1 · sugestão automática — revisar antes de salvar"
+            )
     status = st.pills(
         "Status da faixa principal de circulação",
         tuple(SPATIAL_STATUS_LABELS),
@@ -261,11 +393,8 @@ def render_spatial_panel(
         from streamlit_drawable_canvas import st_canvas
 
         canvas_width, canvas_height = fit_canvas_size(image_width, image_height)
-        reset_key = f"{base_key}_reset_revision"
-        if reset_key not in st.session_state:
-            st.session_state[reset_key] = 0
         initial_drawing = circulation_path_to_fabric_json(
-            saved_geometry,
+            st.session_state[editor_geometry_key],
             canvas_width,
             canvas_height,
         )
@@ -295,6 +424,7 @@ def render_spatial_panel(
                 canvas_width,
                 canvas_height,
             )
+            st.session_state[editor_geometry_key] = geometry
         except AnnotationValidationError as error:
             spatial_error = str(error)
             st.error(f"Polígono inválido: {error}")
@@ -317,6 +447,13 @@ def render_spatial_panel(
         "circulation_path": geometry if status == "annotated" else (),
         "image_width": image_width,
         "image_height": image_height,
+        "circulation_path_origin": annotation_origin(
+            geometry if status == "annotated" else (),
+            suggestion
+            if suggestion_key in st.session_state.segformer_generated
+            else None,
+            existing_origin=existing.get("circulation_path_origin") if existing else None,
+        ),
         "error": spatial_error,
     }
     return draft_key
@@ -403,6 +540,9 @@ def render_annotation_editor(
         "circulation_path": spatial.get("circulation_path", ()),
         "image_width": spatial.get("image_width"),
         "image_height": spatial.get("image_height"),
+        "circulation_path_origin": spatial.get(
+            "circulation_path_origin", "manual"
+        ),
     }
     empty_confirmations: dict[str, bool] = {}
     for group_name, field_names in FIELD_GROUPS:
@@ -482,6 +622,8 @@ def render_annotation_editor(
                 st.session_state.annotations,
                 st.session_state.filter_name,
                 st.session_state.annotation_keys,
+                st.session_state.original_metadata,
+                st.session_state.subset_filter,
             )
             next_after_save(visible_images, updated_visible, current_filename)
         st.rerun()
@@ -525,13 +667,17 @@ with st.sidebar:
                 for image in images
             }
             file_version = annotation_file_version(annotation_csv, schema)
-            if file_version == 1:
-                annotations = migrate_annotation_file_v1_to_v2(
+            if file_version in {1, 2}:
+                annotations = load_annotations(
                     annotation_csv,
                     schema,
-                    image_root,
+                    allow_missing=True,
+                    image_root=image_root,
                 )
-                migration_notice = " CSV migrado com segurança do schema v1 para v2."
+                migration_notice = (
+                    f" CSV v{file_version} carregado de forma compatível; "
+                    "a migração para v3 ocorrerá somente no próximo save."
+                )
             else:
                 annotations = load_annotations(annotation_csv, schema, allow_missing=True)
                 migration_notice = ""
@@ -555,13 +701,42 @@ with st.sidebar:
     images: tuple[ImageItem, ...] = st.session_state.images
     annotations: dict[str, dict[str, Any]] = st.session_state.annotations
     if images:
+        available_subsets = sorted(
+            {metadata.subset for metadata in st.session_state.original_metadata.values()}
+        )
+        if available_subsets:
+            st.selectbox(
+                "Subset",
+                ("all", *available_subsets),
+                format_func=lambda value: "Todos" if value == "all" else value,
+                key="subset_filter",
+            )
+        subset_images = filter_images(
+            images,
+            annotations,
+            "all",
+            st.session_state.annotation_keys,
+            st.session_state.original_metadata,
+            st.session_state.subset_filter,
+        )
         annotated_count = sum(
             st.session_state.annotation_keys.get(image.filename, image.filename) in annotations
-            for image in images
+            for image in subset_images
         )
-        pending_count = len(images) - annotated_count
-        st.caption(f"{len(images)} imagens · {annotated_count} anotadas · {pending_count} pendentes")
-        st.progress(annotated_count / len(images), text=f"{annotated_count}/{len(images)} · {annotated_count / len(images):.1%}")
+        pending_count = len(subset_images) - annotated_count
+        st.caption(
+            f"{len(subset_images)} imagens neste subset · "
+            f"{annotated_count} anotadas"
+        )
+        st.markdown(f"**Pendentes neste filtro: {pending_count}**")
+        if subset_images:
+            st.progress(
+                annotated_count / len(subset_images),
+                text=(
+                    f"{annotated_count}/{len(subset_images)} · "
+                    f"{annotated_count / len(subset_images):.1%}"
+                ),
+            )
         selected_filter = st.segmented_control(
             "Filtro",
             FILTER_LABELS,
@@ -593,6 +768,8 @@ visible_images = filter_images(
     annotations,
     st.session_state.filter_name,
     st.session_state.annotation_keys,
+    st.session_state.original_metadata,
+    st.session_state.subset_filter,
 )
 if not visible_images:
     st.success("Nenhuma imagem corresponde ao filtro atual.")
@@ -620,6 +797,15 @@ with image_column:
         else:
             st.info("Status: Não anotada · preenchimento ainda não salvo")
         render_original_metadata(st.session_state.original_metadata.get(current_filename))
+        if SEGMENTATION_SPLITS.is_file():
+            frozen_test = frozen_test_filenames(
+                str(SEGMENTATION_SPLITS), SEGMENTATION_SPLITS.stat().st_mtime_ns
+            )
+            if current_filename in frozen_test:
+                st.warning(
+                    "Esta imagem pertence ao test congelado do SegFormer v1. "
+                    "Pode ser revisada, mas não deve entrar no próximo treino."
+                )
         try:
             spatial_draft_key = render_spatial_panel(
                 current_image,

@@ -20,7 +20,8 @@ from PIL import Image
 SUPPORTED_IMAGE_EXTENSIONS = frozenset(
     {".bmp", ".gif", ".jpeg", ".jpg", ".png", ".tif", ".tiff", ".webp"}
 )
-METADATA_COLUMNS = ("comment", "annotation_timestamp", "schema_version")
+PROVENANCE_COLUMNS = ("circulation_path_origin",)
+METADATA_COLUMNS = (*PROVENANCE_COLUMNS, "comment", "annotation_timestamp", "schema_version")
 SPATIAL_COLUMNS = (
     "circulation_path_status",
     "circulation_path",
@@ -28,6 +29,12 @@ SPATIAL_COLUMNS = (
     "image_height",
 )
 LEGACY_SCHEMA_VERSION = 1
+SPATIAL_SCHEMA_VERSION = 2
+VALID_CIRCULATION_PATH_ORIGINS = {
+    "manual",
+    "segformer_v1_accepted",
+    "segformer_v1_corrected",
+}
 
 
 class SchemaError(ValueError):
@@ -103,7 +110,24 @@ class AnnotationSchema:
 
     @property
     def legacy_csv_columns(self) -> tuple[str, ...]:
-        return ("filename", *self.field_names, *METADATA_COLUMNS)
+        return (
+            "filename",
+            *self.field_names,
+            "comment",
+            "annotation_timestamp",
+            "schema_version",
+        )
+
+    @property
+    def spatial_v2_csv_columns(self) -> tuple[str, ...]:
+        return (
+            "filename",
+            *self.field_names,
+            *SPATIAL_COLUMNS,
+            "comment",
+            "annotation_timestamp",
+            "schema_version",
+        )
 
     def field(self, name: str) -> FieldDefinition:
         try:
@@ -240,8 +264,8 @@ def load_schema(path: str | Path) -> AnnotationSchema:
             )
         )
 
-    if version != 2:
-        raise SchemaError("O annotation tool atual exige schema_version 2")
+    if version != 3:
+        raise SchemaError("O annotation tool atual exige schema_version 3")
     raw_spatial = _require_mapping(
         root.get("spatial_annotation"), "spatial_annotation"
     )
@@ -488,6 +512,13 @@ def validate_annotation(
         schema.spatial.image_height_field,
     )
 
+    origin = annotation.get("circulation_path_origin", "manual") or "manual"
+    if origin not in VALID_CIRCULATION_PATH_ORIGINS:
+        raise AnnotationValidationError(
+            f"circulation_path_origin inválida: {origin!r}"
+        )
+    normalized["circulation_path_origin"] = origin
+
     comment = annotation.get("comment", "")
     if not isinstance(comment, str):
         raise AnnotationValidationError("comment deve ser texto")
@@ -549,6 +580,7 @@ def annotation_to_row(
     row[schema.spatial.image_height_field] = str(
         normalized[schema.spatial.image_height_field]
     )
+    row["circulation_path_origin"] = normalized["circulation_path_origin"]
     row["comment"] = normalized["comment"]
     row["annotation_timestamp"] = normalized["annotation_timestamp"]
     row["schema_version"] = str(schema.version)
@@ -576,6 +608,9 @@ def row_to_annotation(
     annotation[schema.spatial.image_height_field] = row.get(
         schema.spatial.image_height_field, ""
     )
+    annotation["circulation_path_origin"] = row.get(
+        "circulation_path_origin", "manual"
+    )
     annotation["comment"] = row.get("comment", "")
     annotation["annotation_timestamp"] = row.get("annotation_timestamp", "")
     annotation["schema_version"] = row.get("schema_version", "")
@@ -583,7 +618,7 @@ def row_to_annotation(
 
 
 def annotation_file_version(path: str | Path, schema: AnnotationSchema) -> int | None:
-    """Identifica CSV vazio, v1 ou v2 apenas pelo cabeçalho."""
+    """Identifica CSV vazio, v1, v2 ou atual apenas pelo cabeçalho."""
 
     csv_path = Path(path)
     if not csv_path.exists() or csv_path.stat().st_size == 0:
@@ -593,6 +628,8 @@ def annotation_file_version(path: str | Path, schema: AnnotationSchema) -> int |
         header = tuple(next(reader, ()))
     if header == schema.csv_columns:
         return schema.version
+    if header == schema.spatial_v2_csv_columns:
+        return SPATIAL_SCHEMA_VERSION
     if header == schema.legacy_csv_columns:
         return LEGACY_SCHEMA_VERSION
     raise AnnotationFileError("Cabeçalho incompatível: " + ",".join(header))
@@ -641,6 +678,19 @@ def _legacy_row_to_annotation(
     return validate_annotation(annotation, schema, require_metadata=True)
 
 
+def _spatial_v2_row_to_annotation(
+    row: Mapping[str, str], schema: AnnotationSchema
+) -> dict[str, Any]:
+    """Migra em memória uma linha v2, preservando a geometria humana."""
+
+    if str(row.get("schema_version", "")).strip() != str(SPATIAL_SCHEMA_VERSION):
+        raise AnnotationValidationError("CSV espacial legado deve declarar schema_version 2")
+    prepared = dict(row)
+    prepared["circulation_path_origin"] = "manual"
+    prepared["schema_version"] = str(schema.version)
+    return row_to_annotation(prepared, schema)
+
+
 def load_annotations(
     path: str | Path,
     schema: AnnotationSchema,
@@ -648,7 +698,7 @@ def load_annotations(
     allow_missing: bool = True,
     image_root: str | Path | None = None,
 ) -> dict[str, dict[str, Any]]:
-    """Carrega CSV v2 ou migra v1 em memória quando image_root é informado."""
+    """Carrega o CSV atual ou migra v1/v2 em memória de forma compatível."""
 
     csv_path = Path(path)
     if not csv_path.exists():
@@ -666,7 +716,8 @@ def load_annotations(
             return {}
         fieldnames = tuple(reader.fieldnames)
         is_legacy = fieldnames == schema.legacy_csv_columns
-        if fieldnames != schema.csv_columns and not is_legacy:
+        is_spatial_v2 = fieldnames == schema.spatial_v2_csv_columns
+        if fieldnames != schema.csv_columns and not is_legacy and not is_spatial_v2:
             raise AnnotationFileError(
                 "Cabeçalho incompatível. Esperado: " + ",".join(schema.csv_columns)
             )
@@ -680,6 +731,8 @@ def load_annotations(
                 annotation = (
                     _legacy_row_to_annotation(row, schema, Path(image_root))
                     if is_legacy
+                    else _spatial_v2_row_to_annotation(row, schema)
+                    if is_spatial_v2
                     else row_to_annotation(row, schema)
                 )
             except AnnotationValidationError as error:
@@ -695,17 +748,17 @@ def load_annotations(
     return annotations
 
 
-def migrate_annotation_file_v1_to_v2(
+def migrate_annotation_file(
     path: str | Path,
     schema: AnnotationSchema,
     image_root: str | Path,
 ) -> dict[str, dict[str, Any]]:
-    """Migra um CSV v1 validado para v2 usando substituição atômica."""
+    """Migra um CSV v1/v2 validado para a versão atual atomicamente."""
 
     version = annotation_file_version(path, schema)
     if version in (None, schema.version):
         return load_annotations(path, schema, allow_missing=True)
-    if version != LEGACY_SCHEMA_VERSION:
+    if version not in {LEGACY_SCHEMA_VERSION, SPATIAL_SCHEMA_VERSION}:
         raise AnnotationFileError(f"Versão de CSV não suportada: {version}")
     migrated = load_annotations(
         path,
@@ -715,6 +768,16 @@ def migrate_annotation_file_v1_to_v2(
     )
     write_annotations_atomic(path, migrated.values(), schema)
     return migrated
+
+
+def migrate_annotation_file_v1_to_v2(
+    path: str | Path,
+    schema: AnnotationSchema,
+    image_root: str | Path,
+) -> dict[str, dict[str, Any]]:
+    """Alias compatível; migra qualquer versão antiga para a versão atual."""
+
+    return migrate_annotation_file(path, schema, image_root)
 
 
 def write_annotations_atomic(
