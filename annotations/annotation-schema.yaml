@@ -1,0 +1,223 @@
+schema_version: 2
+schema_name: transitability_features
+description: Características visuais do trecho usadas no protótipo de transitabilidade.
+
+spatial_annotation:
+  name: circulation_path
+  display_name: Faixa principal de circulação
+  description: Corredor estrutural que deveria permanecer disponível para circulação, sem contornar obstáculos internos.
+  status_field: circulation_path_status
+  geometry_field: circulation_path
+  image_width_field: image_width
+  image_height_field: image_height
+  status_options:
+    - value: annotated
+      definition: Existe uma faixa principal identificável e sua geometria foi desenhada.
+    - value: absent
+      definition: Não existe uma faixa principal contínua identificável ou utilizável na cena.
+    - value: unknown
+      definition: Perspectiva, enquadramento ou oclusão impedem determinar a faixa com segurança.
+
+labels:
+  passage_width:
+    display_name: Largura livre de passagem
+    type: single-label
+    required: true
+    model_output: true
+    unknown_value: unknown
+    not_applicable_values: []
+    description: Estimativa visual da largura contínua disponível para uma cadeira de rodas.
+    options:
+      - value: wide
+        definition: Passagem livre aparentemente igual ou superior a aproximadamente 1,50 m.
+      - value: adequate
+        definition: Passagem aparentemente entre aproximadamente 1,20 m e 1,49 m.
+      - value: narrow
+        definition: Aparentemente abaixo de 1,20 m, mas ainda compatível visualmente com passagem de uma cadeira.
+      - value: very_narrow
+        definition: Ainda existe espaço físico, mas aparenta ser insuficiente para uma cadeira comum.
+      - value: blocked
+        definition: Não existe passagem contínua utilizável.
+      - value: unknown
+        definition: Perspectiva ou enquadramento não permitem julgamento confiável.
+
+  obstruction:
+    display_name: Grau de obstrução
+    type: single-label
+    required: true
+    model_output: true
+    unknown_value: unknown
+    not_applicable_values: []
+    description: Quanto objetos relevantes invadem a faixa útil de circulação visível.
+    options:
+      - value: none
+        definition: Nada relevante invade a faixa útil de circulação.
+      - value: partial
+        definition: Existe obstrução dentro da faixa, mas sobra passagem lateral aparente.
+      - value: full
+        definition: A obstrução impede completamente a rota visível.
+      - value: unknown
+        definition: Não é possível determinar o grau de obstrução.
+
+  obstacle_type:
+    display_name: Tipos de obstáculo relevantes
+    type: multilabel
+    required: true
+    model_output: true
+    unknown_value: null
+    not_applicable_values: []
+    empty_means: Nenhum obstáculo relevante para a faixa de circulação.
+    description: Objetos que interferem efetivamente na faixa útil de circulação.
+    options:
+      - {value: vehicle, definition: Veículo ocupando ou invadindo a passagem.}
+      - {value: bike_scooter, definition: Bicicleta ou patinete ocupando ou invadindo a passagem.}
+      - {value: pole, definition: Poste ou elemento vertical fixo dentro da faixa útil.}
+      - {value: sign, definition: Placa ou suporte de sinalização dentro da faixa útil.}
+      - {value: tree, definition: Tronco ou parte de árvore interferindo na passagem.}
+      - {value: vegetation, definition: Vegetação invadindo ou reduzindo a passagem.}
+      - {value: trash_container, definition: Lixeira ou recipiente de resíduos interferindo na passagem.}
+      - {value: construction, definition: Obra barreira ou equipamento de obra interferindo na passagem.}
+      - {value: stairs, definition: Escada ou degraus que interrompem a rota analisada.}
+      - {value: litter_debris, definition: Lixo solto ou entulho relevante sobre a passagem.}
+      - {value: utility, definition: Equipamento ou instalação de utilidade interferindo na passagem.}
+      - {value: street_furniture, definition: Mobiliário urbano interferindo na passagem.}
+      - {value: other, definition: Outro objeto relevante não coberto pelas opções anteriores.}
+
+  surface_condition:
+    display_name: Condição geral da superfície
+    type: single-label
+    required: true
+    model_output: true
+    unknown_value: unknown
+    not_applicable_values: []
+    description: Estado predominante do piso na faixa de circulação visível.
+    options:
+      - {value: regular, definition: Piso visualmente regular firme e contínuo.}
+      - {value: minor_problem, definition: Irregularidade ou degradação localizada mas superfície predominantemente utilizável.}
+      - {value: major_problem, definition: Problema significativo ocupando área relevante ou comprometendo claramente a circulação.}
+      - {value: unknown, definition: Não é possível avaliar a superfície com confiança.}
+
+  surface_obstacle:
+    display_name: Problemas específicos da superfície
+    type: multilabel
+    required: true
+    model_output: true
+    unknown_value: null
+    not_applicable_values: []
+    empty_means: Ausência de problema específico relevante na superfície.
+    description: Tipos observáveis de problema presentes na superfície da faixa de circulação.
+    options:
+      - {value: cracks, definition: Rachaduras ou fissuras relevantes.}
+      - {value: bumpy, definition: Piso com saliências ou textura irregular que produz trepidação.}
+      - {value: uneven_slanted, definition: Piso desnivelado lateralmente ou inclinado de forma irregular.}
+      - {value: height_difference, definition: Ressalto ou diferença localizada de altura na superfície.}
+      - {value: very_broken, definition: Piso extensamente quebrado ou fragmentado.}
+      - {value: grass, definition: Grama ocupando a superfície de passagem.}
+      - {value: sand_gravel, definition: Areia cascalho ou material solto na passagem.}
+      - {value: brick_cobblestone, definition: Tijolo paralelepípedo ou pavimento segmentado irregular.}
+      - {value: pooled_water, definition: Água acumulada na faixa de circulação.}
+      - {value: rail_track, definition: Trilho cruzando ou acompanhando a passagem.}
+      - {value: utility_panel, definition: Tampa painel ou caixa de utilidade embutida no piso e relevante para a passagem.}
+      - {value: debris, definition: Detritos ou material solto sobre a superfície.}
+      - {value: other, definition: Outro problema de superfície não coberto pelas opções anteriores.}
+
+  level_change:
+    display_name: Mudança de nível
+    type: single-label
+    required: true
+    model_output: true
+    unknown_value: unknown
+    not_applicable_values: []
+    description: Presença e intensidade visual de mudança vertical relevante ao longo da rota.
+    options:
+      - {value: none, definition: Nenhum desnível perceptível relevante.}
+      - {value: minor, definition: Pequeno ressalto ou diferença de nível visível.}
+      - {value: step, definition: Degrau meio-fio elevado ou mudança vertical claramente significativa.}
+      - {value: unknown, definition: Não é possível julgar a mudança de nível.}
+
+  ramp_condition:
+    display_name: Condição da rampa ou rebaixamento
+    type: single-label
+    required: true
+    model_output: true
+    unknown_value: unknown
+    not_applicable_values: [not_applicable]
+    description: Disponibilidade e condição de uma solução de rampa quando a cena exige transição de nível.
+    options:
+      - {value: not_applicable, definition: Não existe situação na cena que exija avaliação de rampa.}
+      - {value: clear, definition: Rampa ou rebaixamento aparentemente utilizável e livre.}
+      - {value: problematic, definition: Existe rampa mas há problema visual relevante.}
+      - {value: blocked, definition: Existe rampa porém está fisicamente obstruída.}
+      - {value: missing_required, definition: Existe transição de nível relevante e não há solução acessível aparente.}
+      - {value: unknown, definition: Não é possível avaliar a condição da rampa.}
+
+  curb_access:
+    display_name: Acesso entre calçada e via
+    type: single-label
+    required: true
+    model_output: true
+    unknown_value: unknown
+    not_applicable_values: [not_applicable]
+    description: Forma visível da transição entre calçada e via quando essa transição faz parte da rota.
+    options:
+      - {value: not_applicable, definition: Nenhuma transição calçada-via relevante aparece na rota analisada.}
+      - {value: level, definition: Transição praticamente nivelada.}
+      - {value: ramp, definition: Existe rebaixamento ou rampa.}
+      - {value: raised_no_ramp, definition: Existe meio-fio ou degrau sem rebaixamento adequado aparente.}
+      - {value: blocked, definition: A transição existe porém está obstruída.}
+      - {value: unknown, definition: Não é possível determinar a forma ou condição do acesso.}
+
+  detour:
+    display_name: Possibilidade de desvio
+    type: single-label
+    required: true
+    model_output: true
+    unknown_value: unknown
+    not_applicable_values: [not_needed]
+    description: Existência de alternativa visível para contornar uma barreira e retornar à rota.
+    options:
+      - {value: not_needed, definition: A rota principal não exige desvio.}
+      - {value: available, definition: A imagem mostra alternativa contínua para contornar a barreira e retornar à rota.}
+      - {value: unavailable, definition: A barreira exige desvio e não existe alternativa visível utilizável.}
+      - {value: unknown, definition: O enquadramento não permite concluir se existe alternativa.}
+
+  path_continuity:
+    display_name: Continuidade da rota
+    type: single-label
+    required: true
+    model_output: true
+    unknown_value: unknown
+    not_applicable_values: []
+    description: Continuidade visual da faixa de circulação ao atravessar a cena.
+    options:
+      - {value: continuous, definition: Existe faixa visual contínua de circulação atravessando a cena.}
+      - {value: restricted, definition: A rota continua existindo mas sofre estreitamento desvio ou comprometimento parcial.}
+      - {value: interrupted, definition: Não existe continuidade aparente.}
+      - {value: unknown, definition: Não é possível determinar a continuidade pelo enquadramento.}
+
+  slope:
+    display_name: Inclinação longitudinal aparente
+    type: single-label
+    required: true
+    model_output: true
+    unknown_value: unknown
+    not_applicable_values: []
+    description: Inclinação longitudinal visual do trecho sem estimar porcentagens.
+    options:
+      - {value: flat_gentle, definition: Nenhuma inclinação relevante aparente.}
+      - {value: inclined, definition: Inclinação perceptível sem aparência extrema.}
+      - {value: steep, definition: Inclinação claramente acentuada.}
+      - {value: unknown, definition: A perspectiva não permite julgamento confiável.}
+
+  annotation_confidence:
+    display_name: Confiança da anotação
+    type: single-label
+    required: true
+    model_output: false
+    unknown_value: null
+    not_applicable_values: []
+    description: Metadado sobre a confiabilidade da avaliação humana e nunca target do modelo.
+    options:
+      - {value: high, definition: Evidência visual direta e clara.}
+      - {value: medium, definition: Existe dúvida causada por perspectiva distância oclusão ou fator equivalente.}
+      - {value: low, definition: Classificação pouco confiável e prioritária para revisão.}
