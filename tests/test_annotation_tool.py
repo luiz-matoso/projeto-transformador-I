@@ -20,6 +20,7 @@ from tools.annotation_app.core import (
     discover_images,
     load_annotations,
     load_schema,
+    migrate_annotation_file,
     migrate_annotation_file_v1_to_v2,
     normalize_multilabel,
     save_annotation,
@@ -38,6 +39,14 @@ from tools.annotation_app.presentation import (
     completion_status,
     option_label,
     validate_presentation,
+)
+from tools.annotation_app.suggestions import (
+    ACCEPTED_ORIGIN,
+    CORRECTED_ORIGIN,
+    MANUAL_ORIGIN,
+    annotation_origin,
+    annotation_state,
+    should_offer_suggestion,
 )
 
 
@@ -77,7 +86,7 @@ class AnnotationToolTests(unittest.TestCase):
         }
 
     def test_loads_versioned_schema_and_output_metadata(self) -> None:
-        self.assertEqual(self.schema.version, 2)
+        self.assertEqual(self.schema.version, 3)
         self.assertEqual(len(self.schema.fields), 12)
         self.assertEqual(self.schema.field("obstacle_type").kind, "multilabel")
         self.assertEqual(self.schema.field("surface_obstacle").kind, "multilabel")
@@ -213,7 +222,7 @@ class AnnotationToolTests(unittest.TestCase):
         path = self.root / "duplicates.csv"
         first = self.valid_annotation()
         first["annotation_timestamp"] = "2026-10-18T00:00:00+00:00"
-        first["schema_version"] = 2
+        first["schema_version"] = self.schema.version
         with self.assertRaisesRegex(AnnotationFileError, "duplicado"):
             write_annotations_atomic(path, [first, first], self.schema)
 
@@ -338,9 +347,9 @@ class AnnotationToolTests(unittest.TestCase):
         reopened = load_annotations(path, self.schema)["image.png"]
         self.assertEqual(reopened["circulation_path"], validate_circulation_path(annotation["circulation_path"]))
         self.assertEqual((reopened["image_width"], reopened["image_height"]), (640, 480))
-        self.assertEqual(annotation_file_version(path, self.schema), 2)
+        self.assertEqual(annotation_file_version(path, self.schema), 3)
 
-    def test_migrates_v1_to_v2_preserving_existing_labels(self) -> None:
+    def test_migrates_v1_to_current_preserving_existing_labels(self) -> None:
         image_path = self.root / "image.png"
         Image.new("RGB", (321, 123), color=(10, 20, 30)).save(image_path)
         csv_path = self.root / "legacy.csv"
@@ -367,12 +376,53 @@ class AnnotationToolTests(unittest.TestCase):
 
         migrated = migrate_annotation_file_v1_to_v2(csv_path, self.schema, self.root)
         item = migrated["image.png"]
-        self.assertEqual(annotation_file_version(csv_path, self.schema), 2)
+        self.assertEqual(annotation_file_version(csv_path, self.schema), 3)
         self.assertEqual(item["passage_width"], original["passage_width"])
         self.assertEqual(item["comment"], "preservar")
         self.assertEqual(item["circulation_path_status"], "unknown")
         self.assertEqual(item["circulation_path"], ())
         self.assertEqual((item["image_width"], item["image_height"]), (321, 123))
+        self.assertEqual(item["circulation_path_origin"], MANUAL_ORIGIN)
+
+    def test_loads_and_migrates_v2_with_manual_origin(self) -> None:
+        path = self.root / "v2.csv"
+        annotation = self.valid_annotation()
+        annotation.update(
+            {
+                "annotation_timestamp": "2026-10-20T00:00:00+00:00",
+                "schema_version": 2,
+            }
+        )
+        current = validate_annotation(
+            {**annotation, "schema_version": 3}, self.schema, require_metadata=True
+        )
+        row = annotation_to_row(current, self.schema)
+        row.pop("circulation_path_origin")
+        row["schema_version"] = "2"
+        with path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=self.schema.spatial_v2_csv_columns)
+            writer.writeheader()
+            writer.writerow(row)
+
+        loaded = load_annotations(path, self.schema)
+        self.assertEqual(annotation_file_version(path, self.schema), 2)
+        self.assertEqual(loaded["image.png"]["circulation_path_origin"], MANUAL_ORIGIN)
+        migrate_annotation_file(path, self.schema, self.root)
+        self.assertEqual(annotation_file_version(path, self.schema), 3)
+
+    def test_suggestion_provenance_and_existing_annotation_protection(self) -> None:
+        suggestion = (((0.1, 0.8), (0.5, 0.2), (0.9, 0.8)),)
+        corrected = (((0.1, 0.8), (0.5, 0.25), (0.9, 0.8)),)
+        self.assertEqual(annotation_origin(suggestion, suggestion), ACCEPTED_ORIGIN)
+        self.assertEqual(annotation_origin(corrected, suggestion), CORRECTED_ORIGIN)
+        self.assertEqual(annotation_origin(corrected, None), MANUAL_ORIGIN)
+        self.assertFalse(should_offer_suggestion({"circulation_path_status": "annotated"}, is_editing=False))
+        self.assertTrue(should_offer_suggestion({"circulation_path_status": "annotated"}, is_editing=True))
+
+    def test_annotation_state_distinguishes_pending_and_annotated(self) -> None:
+        annotations = {"saved.png": {"circulation_path_status": "annotated"}}
+        self.assertEqual(annotation_state("saved.png", annotations), "annotated")
+        self.assertEqual(annotation_state("new.png", annotations), "pending")
 
     def test_fabric_adapter_round_trips_and_rescales_saved_polygon(self) -> None:
         geometry = (((0.1, 0.8), (0.4, 0.2), (0.9, 0.8)),)
