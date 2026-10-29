@@ -31,7 +31,7 @@ No painel:
 3. informe o caminho do CSV de anotações;
 4. clique em **Carregar diretório e CSV**;
 5. classifique o caminho de circulação e, quando identificado, desenhe o
-   polígono fechando-o no primeiro ponto;
+   polígono fechando-o no primeiro ponto ou gere uma sugestão SegFormer;
 6. responda pelas pills em português e use **Salvar** ou **Salvar e próxima**.
 
 Para continuar o piloto assistido já gerado, use:
@@ -116,6 +116,21 @@ O formato oficial salvo é uma lista de polígonos com coordenadas normalizadas
 entre `0` e `1`, acompanhada por `image_width` e `image_height` da imagem
 original. O JSON interno do componente de desenho não é persistido.
 
+Em imagens pendentes, **Gerar sugestão SegFormer** executa sob demanda o
+checkpoint `artifacts/segmentation/best_segformer.pt`; nunca há inferência
+automática ao navegar. A máscara binária (threshold `0.5`) tem componentes com
+área inferior ao maior valor entre 64 pixels e 0,05% da imagem removidos. Os
+demais componentes são preservados, convertidos em contornos externos e
+simplificados moderadamente com Douglas–Peucker (`0.003` do perímetro). Todos
+entram no editor existente como polygons normalizados e editáveis.
+
+**Restaurar sugestão** recupera a previsão original e **Limpar** esvazia apenas
+o rascunho. Uma sugestão nunca salva nem marca uma imagem como anotada: somente
+**Salvar** ou **Salvar e próxima**, após revisão humana, persistem ground truth.
+O modelo e o image processor são cacheados pelo Streamlit, CUDA é usada quando
+disponível e CPU funciona como fallback. Falhas de checkpoint ou inferência
+não bloqueiam o desenho manual.
+
 Os controles nativos mantêm ordem de tabulação e foco de teclado previsíveis.
 Atalhos globais (`Ctrl+Enter`, setas e teclas numéricas) não foram adicionados:
 o Streamlit não oferece uma API nativa estável para esses eventos, e injetar
@@ -151,11 +166,11 @@ A interface obtém nomes, tipos, opções, definições, obrigatoriedade, `unkno
 `not_applicable` e indicação de target diretamente do schema. Alterações futuras
 devem ser versionadas em `schema_version`.
 
-Ao abrir um CSV v1, a ferramenta realiza uma única migração atômica para v2:
-mantém todos os valores, comentário e timestamp existentes; registra as
-dimensões originais da imagem; e inicializa o caminho de circulação como **Não é
-possível determinar**, sem fabricar polígonos. Depois disso, o arquivo segue
-normalmente no schema v2.
+CSV v1 e v2 são carregados de forma compatível. A migração atômica para v3
+ocorre somente no próximo salvamento: valores, geometria, comentário e timestamp
+existentes são preservados e recebem origem `manual`. No caso de v1, as dimensões
+originais são lidas e o caminho de circulação é inicializado como **Não é
+possível determinar**, sem fabricar polígonos.
 
 ## Formato do CSV
 
@@ -179,6 +194,7 @@ circulation_path_status,
 circulation_path,
 image_width,
 image_height,
+circulation_path_origin,
 comment,
 annotation_timestamp,
 schema_version
@@ -195,7 +211,9 @@ schema_version
   obrigatório quando o status é `annotated` e deve ser vazio nos demais casos.
 - `image_width` e `image_height` registram dimensões positivas da imagem
   original, nunca do canvas redimensionado.
-- `schema_version` é `2` nesta versão.
+- `circulation_path_origin` registra `manual`, `segformer_v1_accepted` ou
+  `segformer_v1_corrected`. A origem só é persistida junto com o save humano.
+- `schema_version` é `3` nesta versão.
 - `annotation_confidence` é metadado humano e não é output do modelo.
 
 O painel rejeita cabeçalhos incompatíveis, versões divergentes, filenames
