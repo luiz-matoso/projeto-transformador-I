@@ -1,7 +1,3 @@
-"""Monta um piloto diversificado sem extrair integralmente datasets ZIP."""
-
-from __future__ import annotations
-
 import argparse
 import csv
 import hashlib
@@ -41,7 +37,7 @@ MANIFEST_COLUMNS = (
 
 
 class PilotBuildError(ValueError):
-    """Erro controlado de fonte, metadado ou composição do piloto."""
+    pass
 
 
 @dataclass(frozen=True)
@@ -467,7 +463,9 @@ def build_pilot(
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description="Monta um piloto diversificado sem extrair datasets completos."
+    )
     parser.add_argument("--obstacle", required=True, type=Path)
     parser.add_argument("--surface-problem", required=True, type=Path)
     parser.add_argument("--curb-ramp", required=True, type=Path)

@@ -1,7 +1,3 @@
-"""Geração de galeria HTML local para revisão visual do dataset."""
-
-from __future__ import annotations
-
 from html import escape
 from pathlib import Path
 from typing import Sequence

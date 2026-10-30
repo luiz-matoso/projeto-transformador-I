@@ -1,5 +1,3 @@
-"""Carregamento dos datasets usados pelo módulo de ML."""
-
 from .obstacles import (
     DEFAULT_SPLIT_SEED,
     DEFAULT_VALIDATION_FRACTION,

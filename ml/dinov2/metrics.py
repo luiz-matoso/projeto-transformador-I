@@ -1,7 +1,3 @@
-"""Métricas transparentes por head sem dependência de scikit-learn."""
-
-from __future__ import annotations
-
 from collections.abc import Mapping, Sequence
 
 import numpy as np

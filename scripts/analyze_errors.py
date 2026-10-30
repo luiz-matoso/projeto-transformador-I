@@ -1,7 +1,3 @@
-"""Gera uma análise factual dos erros do checkpoint atual no conjunto de teste."""
-
-from __future__ import annotations
-
 import argparse
 import csv
 import shutil
@@ -23,8 +19,6 @@ DEFAULT_OUTPUT_DIRECTORY = Path("artifacts/error-analysis")
 
 @dataclass(frozen=True)
 class ErrorExample:
-    """Uma predição incorreta associada à imagem de origem."""
-
     sample_index: int
     filename: str
     probability: float
@@ -32,8 +26,6 @@ class ErrorExample:
 
 @dataclass(frozen=True)
 class LabelSummary:
-    """Contagens e métricas binárias de uma label."""
-
     label: str
     real_positives: int
     real_negatives: int
@@ -150,8 +142,6 @@ def write_summary_csv(
     output_path: Path,
     summaries: Sequence[LabelSummary],
 ) -> None:
-    """Grava a tabela principal da análise."""
-
     fieldnames = tuple(LabelSummary.__dataclass_fields__)
     with output_path.open("w", encoding="utf-8", newline="") as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
@@ -168,8 +158,6 @@ def copy_error_examples(
     image_directory: Path,
     examples: dict[str, dict[str, tuple[ErrorExample, ...]]],
 ) -> None:
-    """Copia imagens selecionadas sem tocar nos arquivos de origem."""
-
     for label in TARGET_LABELS:
         for error_type in ("false_positive", "false_negative"):
             target_directory = output_directory / label / error_type
@@ -188,8 +176,6 @@ def write_examples_csv(
     output_path: Path,
     examples: dict[str, dict[str, tuple[ErrorExample, ...]]],
 ) -> None:
-    """Mantém a correspondência entre cada cópia e seu filename original."""
-
     with output_path.open("w", encoding="utf-8", newline="") as csv_file:
         writer = csv.writer(csv_file)
         writer.writerow(

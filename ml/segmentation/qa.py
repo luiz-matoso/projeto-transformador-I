@@ -1,7 +1,3 @@
-"""QA estrutural e visual das anotações de circulation_path."""
-
-from __future__ import annotations
-
 import argparse
 import statistics
 from collections import Counter
@@ -131,7 +127,9 @@ def generate_qa_artifacts(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description="Gera o QA das anotações de faixa de circulação."
+    )
     parser.add_argument("--annotations", type=Path, default=Path("annotations/transitability_annotations.csv"))
     parser.add_argument("--pilot-root", type=Path, default=Path("data/annotation-pilot"))
     parser.add_argument("--output", type=Path, default=Path("artifacts/segmentation"))

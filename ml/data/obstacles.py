@@ -1,7 +1,3 @@
-"""Dataset multilabel de obstáculos para uso futuro com modelos PyTorch."""
-
-from __future__ import annotations
-
 import csv
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -32,16 +28,12 @@ DEFAULT_VALIDATION_FRACTION = 0.2
 
 @dataclass(frozen=True)
 class ObstacleSample:
-    """Referência de uma imagem e seu vetor multilabel."""
-
     filename: str
     labels: tuple[float, ...]
 
 
 @dataclass(frozen=True)
 class BatchSummary:
-    """Resumo de um batch validado."""
-
     batch_size: int
     image_shape: tuple[int, ...]
     label_shape: tuple[int, ...]
@@ -51,8 +43,6 @@ class BatchSummary:
 
 @dataclass(frozen=True)
 class ObstacleDataLoaders:
-    """DataLoaders de treino e teste com a mesma ordem de labels."""
-
     train: DataLoader[tuple[Tensor, Tensor]]
     test: DataLoader[tuple[Tensor, Tensor]]
     labels: tuple[str, ...] = TARGET_LABELS
@@ -60,8 +50,6 @@ class ObstacleDataLoaders:
 
 @dataclass(frozen=True)
 class TrainingDataLoaders:
-    """DataLoaders derivados exclusivamente do CSV de treino."""
-
     train: DataLoader[tuple[Tensor, Tensor]]
     validation: DataLoader[tuple[Tensor, Tensor]]
     labels: tuple[str, ...] = TARGET_LABELS
@@ -187,8 +175,6 @@ def create_obstacle_dataloaders(
     num_workers: int = 0,
     pin_memory: bool | None = None,
 ) -> ObstacleDataLoaders:
-    """Instancia DataLoaders prontos para treino e avaliação multilabel."""
-
     if batch_size <= 0:
         raise ValueError("batch_size deve ser maior que zero")
     if num_workers < 0:
@@ -307,8 +293,6 @@ def create_test_dataloader(
     num_workers: int = 0,
     pin_memory: bool | None = None,
 ) -> DataLoader[tuple[Tensor, Tensor]]:
-    """Cria somente o DataLoader de teste para avaliação final."""
-
     if batch_size <= 0:
         raise ValueError("batch_size deve ser maior que zero")
     if num_workers < 0:

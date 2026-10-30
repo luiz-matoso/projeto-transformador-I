@@ -1,7 +1,3 @@
-"""Testes do piloto assistido e das regras de coerência."""
-
-from __future__ import annotations
-
 import csv
 import tempfile
 import unittest

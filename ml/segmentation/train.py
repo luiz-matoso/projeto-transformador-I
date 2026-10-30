@@ -1,7 +1,3 @@
-"""Treino reproduzível do SegFormer-B0 para circulation_path binária."""
-
-from __future__ import annotations
-
 import argparse
 import csv
 import json
@@ -152,7 +148,7 @@ def _test_visuals(model, processor, records: list[SegmentationRecord], output: P
 def main() -> int:
     from transformers import AutoImageProcessor
 
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description="Treina o SegFormer-B0 v1.")
     parser.add_argument("--annotations", type=Path, default=Path("annotations/transitability_annotations.csv"))
     parser.add_argument("--pilot-root", type=Path, default=Path("data/annotation-pilot"))
     parser.add_argument("--output", type=Path, default=Path("artifacts/segmentation"))

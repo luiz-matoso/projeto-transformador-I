@@ -1,7 +1,3 @@
-"""Leitura, validação, rasterização e split do dataset de segmentação."""
-
-from __future__ import annotations
-
 import csv
 import json
 import math

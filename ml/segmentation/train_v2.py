@@ -1,7 +1,3 @@
-"""Treino comparável do SegFormer v2 com holdouts congelados do v1."""
-
-from __future__ import annotations
-
 import argparse
 import csv
 import hashlib
@@ -240,7 +236,7 @@ def _write_comparison(
 def main() -> int:
     from transformers import AutoImageProcessor
 
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description="Treina o SegFormer-B0 v2.")
     parser.add_argument("--annotations", type=Path, default=Path("annotations/transitability_annotations.csv"))
     parser.add_argument("--pilot-root", type=Path, default=Path("data/annotation-pilot"))
     parser.add_argument("--v1-root", type=Path, default=Path("artifacts/segmentation"))

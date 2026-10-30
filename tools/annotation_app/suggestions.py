@@ -1,7 +1,3 @@
-"""Regras pequenas e testáveis para sugestões assistidas do SegFormer."""
-
-from __future__ import annotations
-
 from collections.abc import Sequence
 from typing import Any
 

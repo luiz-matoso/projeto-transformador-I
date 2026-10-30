@@ -1,7 +1,3 @@
-"""Inferência reutilizável de ``circulation_path`` com o SegFormer v1."""
-
-from __future__ import annotations
-
 import argparse
 import time
 from dataclasses import dataclass
@@ -237,7 +233,9 @@ def predict_circulation_path(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description="Executa inferência da faixa de circulação com o SegFormer."
+    )
     parser.add_argument("--image", required=True, type=Path)
     parser.add_argument("--checkpoint", type=Path, default=DEFAULT_CHECKPOINT)
     parser.add_argument("--output-dir", type=Path)

@@ -1,7 +1,3 @@
-"""DINOv2 congelado com uma head independente para cada propriedade."""
-
-from __future__ import annotations
-
 from collections.abc import Mapping, Sequence
 from typing import Any
 

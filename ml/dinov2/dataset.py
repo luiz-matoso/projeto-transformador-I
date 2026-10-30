@@ -1,7 +1,3 @@
-"""Dataset, preprocessing e split por panorama para o DINOv2 multitarefa."""
-
-from __future__ import annotations
-
 import csv
 import json
 import random

@@ -1,7 +1,3 @@
-"""Script de linha de comando para inspecionar o dataset de obstáculos."""
-
-from __future__ import annotations
-
 import argparse
 import csv
 import sys

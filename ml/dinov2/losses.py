@@ -1,7 +1,3 @@
-"""Loss balanceada entre heads categóricas e multilabel."""
-
-from __future__ import annotations
-
 from collections.abc import Mapping, Sequence
 
 import torch

@@ -1,7 +1,3 @@
-"""Configuração exclusivamente visual da interface de anotação."""
-
-from __future__ import annotations
-
 from dataclasses import dataclass
 from typing import Any
 
@@ -45,7 +41,6 @@ class CompletionStatus:
 
 
 def option_label(field_name: str, value: str) -> str:
-    """Retorna um rótulo humano sem modificar o valor persistido."""
     return OPTION_LABELS.get(field_name, {}).get(value, value)
 
 
@@ -85,7 +80,6 @@ def completion_status(
 
 
 def field_help(field: FieldDefinition) -> str:
-    """Monta a ajuda compacta exibida no popover de uma propriedade."""
     lines = [field.description, ""]
     lines.extend(
         f"- **{option_label(field.name, option.value)}:** {option.definition}"

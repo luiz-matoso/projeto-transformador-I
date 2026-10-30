@@ -1,7 +1,3 @@
-"""Testes unitários do pipeline de segmentação sem usar o dataset real."""
-
-from __future__ import annotations
-
 import csv
 import json
 import tempfile
