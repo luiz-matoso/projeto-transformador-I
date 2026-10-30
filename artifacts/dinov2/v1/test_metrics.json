@@ -1,0 +1,511 @@
+{
+  "aggregate_macro_f1": 0.2773075796638926,
+  "loss": 1.2826642743472396,
+  "heads": {
+    "passage_width": {
+      "macro_f1": 0.26315789473684215,
+      "weighted_f1": 0.18733615648316193,
+      "accuracy": 0.2413793103448276,
+      "per_class": {
+        "wide": {
+          "support": 1,
+          "precision": 0.2,
+          "recall": 1.0,
+          "f1": 0.33333333333333337
+        },
+        "adequate": {
+          "support": 7,
+          "precision": 0.25,
+          "recall": 0.42857142857142855,
+          "f1": 0.3157894736842105
+        },
+        "narrow": {
+          "support": 13,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "very_narrow": {
+          "support": 3,
+          "precision": 0.16666666666666666,
+          "recall": 0.3333333333333333,
+          "f1": 0.2222222222222222
+        },
+        "blocked": {
+          "support": 5,
+          "precision": 0.5,
+          "recall": 0.4,
+          "f1": 0.4444444444444445
+        }
+      },
+      "confusion_matrix": [
+        [
+          1,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          3,
+          2,
+          2,
+          0
+        ],
+        [
+          4,
+          5,
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          1,
+          0,
+          1,
+          1
+        ],
+        [
+          0,
+          3,
+          0,
+          0,
+          2
+        ]
+      ],
+      "class_order": [
+        "wide",
+        "adequate",
+        "narrow",
+        "very_narrow",
+        "blocked"
+      ],
+      "valid_samples": 29
+    },
+    "obstruction": {
+      "macro_f1": 0.18803418803418803,
+      "weighted_f1": 0.3890362511052166,
+      "accuracy": 0.3793103448275862,
+      "per_class": {
+        "none": {
+          "support": 3,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "partial": {
+          "support": 20,
+          "precision": 0.5789473684210527,
+          "recall": 0.55,
+          "f1": 0.5641025641025641
+        },
+        "full": {
+          "support": 6,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          0,
+          3,
+          0
+        ],
+        [
+          8,
+          11,
+          1
+        ],
+        [
+          1,
+          5,
+          0
+        ]
+      ],
+      "class_order": [
+        "none",
+        "partial",
+        "full"
+      ],
+      "valid_samples": 29
+    },
+    "surface_condition": {
+      "macro_f1": 0.44689754689754685,
+      "weighted_f1": 0.48395282878041496,
+      "accuracy": 0.5172413793103449,
+      "per_class": {
+        "regular": {
+          "support": 8,
+          "precision": 0.25,
+          "recall": 0.125,
+          "f1": 0.16666666666666666
+        },
+        "minor_problem": {
+          "support": 15,
+          "precision": 0.55,
+          "recall": 0.7333333333333333,
+          "f1": 0.6285714285714286
+        },
+        "major_problem": {
+          "support": 6,
+          "precision": 0.6,
+          "recall": 0.5,
+          "f1": 0.5454545454545454
+        }
+      },
+      "confusion_matrix": [
+        [
+          1,
+          7,
+          0
+        ],
+        [
+          2,
+          11,
+          2
+        ],
+        [
+          1,
+          2,
+          3
+        ]
+      ],
+      "class_order": [
+        "regular",
+        "minor_problem",
+        "major_problem"
+      ],
+      "valid_samples": 29
+    },
+    "level_change": {
+      "macro_f1": 0.24999999999999997,
+      "weighted_f1": 0.4821428571428571,
+      "accuracy": 0.5357142857142857,
+      "per_class": {
+        "none": {
+          "support": 18,
+          "precision": 0.6818181818181818,
+          "recall": 0.8333333333333334,
+          "f1": 0.7499999999999999
+        },
+        "minor": {
+          "support": 5,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "step": {
+          "support": 5,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          15,
+          2,
+          1
+        ],
+        [
+          3,
+          0,
+          2
+        ],
+        [
+          4,
+          1,
+          0
+        ]
+      ],
+      "class_order": [
+        "none",
+        "minor",
+        "step"
+      ],
+      "valid_samples": 28
+    },
+    "path_continuity": {
+      "macro_f1": 0.3434959349593496,
+      "weighted_f1": 0.5463850174216028,
+      "accuracy": 0.6071428571428571,
+      "per_class": {
+        "continuous": {
+          "support": 18,
+          "precision": 0.6956521739130435,
+          "recall": 0.8888888888888888,
+          "f1": 0.7804878048780488
+        },
+        "restricted": {
+          "support": 5,
+          "precision": 0.3333333333333333,
+          "recall": 0.2,
+          "f1": 0.25
+        },
+        "interrupted": {
+          "support": 5,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          16,
+          1,
+          1
+        ],
+        [
+          3,
+          1,
+          1
+        ],
+        [
+          4,
+          1,
+          0
+        ]
+      ],
+      "class_order": [
+        "continuous",
+        "restricted",
+        "interrupted"
+      ],
+      "valid_samples": 28
+    },
+    "obstacle_type": {
+      "macro_f1": 0.22146263120208529,
+      "micro_f1": 0.31506849315068497,
+      "precision": 0.22115384615384615,
+      "recall": 0.5476190476190477,
+      "per_label": {
+        "vehicle": {
+          "support": 1,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "threshold": 0.8
+        },
+        "bike_scooter": {
+          "support": 1,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "threshold": 0.4
+        },
+        "pole": {
+          "support": 6,
+          "precision": 0.3333333333333333,
+          "recall": 0.8333333333333334,
+          "f1": 0.47619047619047616,
+          "threshold": 0.6
+        },
+        "sign": {
+          "support": 4,
+          "precision": 0.17391304347826086,
+          "recall": 1.0,
+          "f1": 0.29629629629629634,
+          "threshold": 0.2
+        },
+        "tree": {
+          "support": 2,
+          "precision": 0.14285714285714285,
+          "recall": 0.5,
+          "f1": 0.22222222222222224,
+          "threshold": 0.7
+        },
+        "vegetation": {
+          "support": 7,
+          "precision": 0.2916666666666667,
+          "recall": 1.0,
+          "f1": 0.45161290322580644,
+          "threshold": 0.2
+        },
+        "trash_container": {
+          "support": 2,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "threshold": 0.8
+        },
+        "construction": {
+          "support": 2,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "threshold": 0.7
+        },
+        "stairs": {
+          "support": 5,
+          "precision": 0.6666666666666666,
+          "recall": 0.4,
+          "f1": 0.5,
+          "threshold": 0.8
+        },
+        "litter_debris": {
+          "support": 2,
+          "precision": 0.07142857142857142,
+          "recall": 0.5,
+          "f1": 0.125,
+          "threshold": 0.4
+        },
+        "utility": {
+          "support": 5,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "threshold": 0.7
+        },
+        "street_furniture": {
+          "support": 3,
+          "precision": 1.0,
+          "recall": 0.3333333333333333,
+          "f1": 0.5,
+          "threshold": 0.5
+        },
+        "other": {
+          "support": 2,
+          "precision": 0.18181818181818182,
+          "recall": 1.0,
+          "f1": 0.3076923076923077,
+          "threshold": 0.4
+        }
+      },
+      "thresholds": {
+        "vehicle": 0.8,
+        "bike_scooter": 0.4,
+        "pole": 0.6,
+        "sign": 0.2,
+        "tree": 0.7,
+        "vegetation": 0.2,
+        "trash_container": 0.8,
+        "construction": 0.7,
+        "stairs": 0.8,
+        "litter_debris": 0.4,
+        "utility": 0.7,
+        "street_furniture": 0.5,
+        "other": 0.4
+      },
+      "samples": 29
+    },
+    "surface_obstacle": {
+      "macro_f1": 0.22810486181723638,
+      "micro_f1": 0.4419889502762431,
+      "precision": 0.3053435114503817,
+      "recall": 0.8,
+      "per_label": {
+        "cracks": {
+          "support": 11,
+          "precision": 0.6666666666666666,
+          "recall": 0.7272727272727273,
+          "f1": 0.6956521739130435,
+          "threshold": 0.5
+        },
+        "bumpy": {
+          "support": 12,
+          "precision": 0.4074074074074074,
+          "recall": 0.9166666666666666,
+          "f1": 0.5641025641025641,
+          "threshold": 0.2
+        },
+        "uneven_slanted": {
+          "support": 6,
+          "precision": 0.2727272727272727,
+          "recall": 1.0,
+          "f1": 0.42857142857142855,
+          "threshold": 0.2
+        },
+        "height_difference": {
+          "support": 5,
+          "precision": 0.18181818181818182,
+          "recall": 0.8,
+          "f1": 0.2962962962962963,
+          "threshold": 0.3
+        },
+        "very_broken": {
+          "support": 2,
+          "precision": 0.14285714285714285,
+          "recall": 0.5,
+          "f1": 0.22222222222222224,
+          "threshold": 0.4
+        },
+        "grass": {
+          "support": 8,
+          "precision": 0.3684210526315789,
+          "recall": 0.875,
+          "f1": 0.5185185185185185,
+          "threshold": 0.4
+        },
+        "sand_gravel": {
+          "support": 3,
+          "precision": 0.13636363636363635,
+          "recall": 1.0,
+          "f1": 0.24000000000000002,
+          "threshold": 0.2
+        },
+        "brick_cobblestone": {
+          "support": 1,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "threshold": 0.7
+        },
+        "pooled_water": {
+          "support": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "threshold": 0.5
+        },
+        "rail_track": {
+          "support": 1,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "threshold": 0.5
+        },
+        "utility_panel": {
+          "support": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "threshold": 0.5
+        },
+        "debris": {
+          "support": 1,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "threshold": 0.5
+        },
+        "other": {
+          "support": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "threshold": 0.5
+        }
+      },
+      "thresholds": {
+        "cracks": 0.5,
+        "bumpy": 0.2,
+        "uneven_slanted": 0.2,
+        "height_difference": 0.3,
+        "very_broken": 0.4,
+        "grass": 0.4,
+        "sand_gravel": 0.2,
+        "brick_cobblestone": 0.7,
+        "pooled_water": 0.5,
+        "rail_track": 0.5,
+        "utility_panel": 0.5,
+        "debris": 0.5,
+        "other": 0.5
+      },
+      "samples": 29
+    }
+  },
+  "threshold_source": "validation only"
+}

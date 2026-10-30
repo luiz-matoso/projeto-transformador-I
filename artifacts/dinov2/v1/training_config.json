@@ -1,0 +1,144 @@
+{
+  "model_name": "facebook/dinov2-base",
+  "embedding_size": 768,
+  "backbone_frozen": true,
+  "representation": "CLS token",
+  "classes": {
+    "passage_width": [
+      "wide",
+      "adequate",
+      "narrow",
+      "very_narrow",
+      "blocked"
+    ],
+    "obstruction": [
+      "none",
+      "partial",
+      "full"
+    ],
+    "surface_condition": [
+      "regular",
+      "minor_problem",
+      "major_problem"
+    ],
+    "level_change": [
+      "none",
+      "minor",
+      "step"
+    ],
+    "path_continuity": [
+      "continuous",
+      "restricted",
+      "interrupted"
+    ],
+    "obstacle_type": [
+      "vehicle",
+      "bike_scooter",
+      "pole",
+      "sign",
+      "tree",
+      "vegetation",
+      "trash_container",
+      "construction",
+      "stairs",
+      "litter_debris",
+      "utility",
+      "street_furniture",
+      "other"
+    ],
+    "surface_obstacle": [
+      "cracks",
+      "bumpy",
+      "uneven_slanted",
+      "height_difference",
+      "very_broken",
+      "grass",
+      "sand_gravel",
+      "brick_cobblestone",
+      "pooled_water",
+      "rail_track",
+      "utility_panel",
+      "debris",
+      "other"
+    ]
+  },
+  "preprocessing": {
+    "inside_region": "100% original",
+    "outside_brightness": 0.45,
+    "outside_saturation": 0.2,
+    "outside_gaussian_blur_radius": 1.2,
+    "processor": "facebook/dinov2-base"
+  },
+  "loss": "mean of per-head CE/BCE losses",
+  "categorical_class_weights_from_train": {
+    "passage_width": [
+      2.9777777194976807,
+      0.7882353067398071,
+      0.4466666579246521,
+      1.914285659790039,
+      1.5764706134796143
+    ],
+    "obstruction": [
+      1.207207202911377,
+      0.6380952596664429,
+      1.6543209552764893
+    ],
+    "surface_condition": [
+      0.8589743375778198,
+      0.7570621371269226,
+      1.9420289993286133
+    ],
+    "level_change": [
+      0.4336569607257843,
+      2.4814815521240234,
+      3.4358973503112793
+    ],
+    "path_continuity": [
+      0.5317460298538208,
+      2.0303030014038086,
+      1.5952380895614624
+    ]
+  },
+  "multilabel_pos_weights_from_train_capped_at_20": {
+    "obstacle_type": [
+      20.0,
+      20.0,
+      3.060606002807617,
+      7.375,
+      8.571428298950195,
+      2.941176414489746,
+      20.0,
+      8.571428298950195,
+      18.14285659790039,
+      11.181818008422852,
+      7.375,
+      20.0,
+      20.0
+    ],
+    "surface_obstacle": [
+      2.526315689086914,
+      2.045454502105713,
+      3.1875,
+      9.307692527770996,
+      11.181818008422852,
+      2.526315689086914,
+      11.181818008422852,
+      20.0,
+      20.0,
+      20.0,
+      1.0,
+      20.0,
+      20.0
+    ]
+  },
+  "hyperparameters": {
+    "epochs": 30,
+    "patience": 5,
+    "batch_size": 8,
+    "learning_rate": 0.001,
+    "weight_decay": 0.01,
+    "optimizer": "AdamW",
+    "amp": true,
+    "seed": 42
+  }
+}
