@@ -7,7 +7,7 @@ import json
 import math
 import random
 from collections import Counter, defaultdict
-from collections.abc import Sequence
+from collections.abc import Collection, Sequence
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Any
@@ -120,6 +120,8 @@ def _manifest_index(manifest_path: Path) -> dict[str, dict[str, str]]:
 def audit_segmentation_annotations(
     annotations_csv: str | Path,
     pilot_root: str | Path,
+    *,
+    excluded_statuses: Collection[str] = (),
 ) -> tuple[list[SegmentationRecord], list[DatasetQaIssue]]:
     """Audita todas as linhas e devolve somente registros estruturalmente válidos."""
 
@@ -149,10 +151,13 @@ def audit_segmentation_annotations(
         if metadata is None:
             issue("missing_manifest_entry", "imagem não encontrada no manifesto do piloto")
             continue
-        if row.get("circulation_path_status") != "annotated":
+        status = row.get("circulation_path_status", "")
+        if status in excluded_statuses:
+            continue
+        if status != "annotated":
             issue(
                 "status_not_annotated",
-                f"circulation_path_status={row.get('circulation_path_status')!r}; esperado 'annotated'",
+                f"circulation_path_status={status!r}; esperado 'annotated'",
             )
             continue
         try:
@@ -252,6 +257,80 @@ def create_grouped_split(
         subset_counts[chosen].update(group_subsets)
     if counts != Counter(targets):
         raise ValueError(f"Split incorreto: {dict(counts)}")
+    return assignments
+
+
+def create_expanded_split(
+    records: Sequence[SegmentationRecord],
+    frozen_splits_csv: str | Path,
+    *,
+    expected_holdout_size: int = 15,
+) -> dict[str, str]:
+    """Preserva validation/test do v1 e direciona todo registro novo ao treino."""
+
+    path = Path(frozen_splits_csv)
+    with path.open("r", encoding="utf-8-sig", newline="") as handle:
+        reader = csv.DictReader(handle)
+        required = {"filename", "split"}
+        if not required <= set(reader.fieldnames or ()):
+            raise ValueError("splits.csv congelado não possui filename e split")
+        rows = list(reader)
+    frozen = {
+        split: {row["filename"] for row in rows if row["split"] == split}
+        for split in ("validation", "test")
+    }
+    for split, filenames in frozen.items():
+        if len(filenames) != expected_holdout_size:
+            raise ValueError(
+                f"Split v1 {split} deve conter {expected_holdout_size} imagens; "
+                f"encontradas {len(filenames)}"
+            )
+    record_names = [record.filename for record in records]
+    if len(record_names) != len(set(record_names)):
+        raise ValueError("Registros v2 contêm filenames duplicados")
+    available = set(record_names)
+    missing = (frozen["validation"] | frozen["test"]) - available
+    if missing:
+        raise ValueError(
+            "Holdout congelado ausente nas máscaras válidas: "
+            + ", ".join(sorted(missing))
+        )
+    if frozen["validation"] & frozen["test"]:
+        raise ValueError("Validation e test congelados possuem overlap")
+    assignments = {
+        filename: (
+            "validation"
+            if filename in frozen["validation"]
+            else "test"
+            if filename in frozen["test"]
+            else "train"
+        )
+        for filename in record_names
+    }
+    panorama_splits: dict[str, set[str]] = defaultdict(set)
+    for record in records:
+        panorama_splits[record.panorama_id].add(assignments[record.filename])
+    conflicts = {
+        panorama: splits
+        for panorama, splits in panorama_splits.items()
+        if len(splits) > 1
+    }
+    if conflicts:
+        details = ", ".join(
+            f"{panorama}={sorted(splits)}"
+            for panorama, splits in sorted(conflicts.items())
+        )
+        raise ValueError(f"Panoramas atravessam splits: {details}")
+    counts = Counter(assignments.values())
+    expected = Counter(
+        {
+            "train": len(records) - 2 * expected_holdout_size,
+            "validation": expected_holdout_size,
+            "test": expected_holdout_size,
+        }
+    )
+    if counts != expected:
+        raise ValueError(f"Split v2 incorreto: {dict(counts)}; esperado {dict(expected)}")
     return assignments
 
 
