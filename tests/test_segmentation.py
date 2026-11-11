@@ -18,12 +18,14 @@ from ml.segmentation.dataset import (
     CirculationPathDataset,
     SegmentationRecord,
     audit_segmentation_annotations,
+    create_expanded_split,
     create_grouped_split,
     normalized_point_to_pixel,
     parse_polygons,
     rasterize_polygons,
     resize_binary_mask,
 )
+from ml.segmentation.train_v2 import _v1_hashes, validate_v2_output_path
 from ml.segmentation.predict import (
     SegformerPredictor,
     mask_to_normalized_polygons,
@@ -164,6 +166,69 @@ class SegmentationDatasetTests(unittest.TestCase):
             by_panorama[record.panorama_id].add(assignments[record.filename])
         self.assertTrue(all(len(splits) == 1 for splits in by_panorama.values()))
 
+    def test_expanded_split_preserves_holdouts_and_uses_all_remaining_for_train(self) -> None:
+        records = [self._record(index) for index in range(192)]
+        frozen = self.root / "splits.csv"
+        with frozen.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=("filename", "split"))
+            writer.writeheader()
+            for index in range(105):
+                split = "train" if index < 75 else "validation" if index < 90 else "test"
+                writer.writerow({"filename": f"{index}.png", "split": split})
+
+        first = create_expanded_split(records, frozen)
+        second = create_expanded_split(records, frozen)
+
+        self.assertEqual(first, second)
+        self.assertEqual(Counter(first.values()), {"train": 162, "validation": 15, "test": 15})
+        self.assertEqual(
+            {name for name, split in first.items() if split == "validation"},
+            {f"{index}.png" for index in range(75, 90)},
+        )
+        self.assertEqual(
+            {name for name, split in first.items() if split == "test"},
+            {f"{index}.png" for index in range(90, 105)},
+        )
+        split_sets = {
+            split: {name for name, value in first.items() if value == split}
+            for split in ("train", "validation", "test")
+        }
+        self.assertFalse(split_sets["train"] & split_sets["validation"])
+        self.assertFalse(split_sets["train"] & split_sets["test"])
+        self.assertFalse(split_sets["validation"] & split_sets["test"])
+
+    def test_expanded_split_rejects_panorama_crossing_frozen_holdout(self) -> None:
+        records = [self._record(index) for index in range(192)]
+        records[106] = self._record(106, panorama=records[75].panorama_id)
+        frozen = self.root / "splits.csv"
+        with frozen.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=("filename", "split"))
+            writer.writeheader()
+            for index in range(105):
+                split = "train" if index < 75 else "validation" if index < 90 else "test"
+                writer.writerow({"filename": f"{index}.png", "split": split})
+        with self.assertRaisesRegex(ValueError, "Panoramas atravessam splits"):
+            create_expanded_split(records, frozen)
+
+    def test_v2_output_isolated_from_v1_artifacts(self) -> None:
+        v1 = self.root / "segmentation"
+        v2 = v1 / "v2"
+        v1.mkdir()
+        for name in (
+            "best_segformer.pt",
+            "splits.csv",
+            "training_history.csv",
+            "test_metrics.json",
+        ):
+            (v1 / name).write_bytes(f"v1-{name}".encode())
+        before = _v1_hashes(v1)
+        validate_v2_output_path(v2, v1)
+        v2.mkdir()
+        (v2 / "splits.csv").write_text("v2", encoding="utf-8")
+        self.assertEqual(_v1_hashes(v1), before)
+        with self.assertRaisesRegex(ValueError, "não pode ser"):
+            validate_v2_output_path(v1, v1)
+
     def test_audit_parses_annotation_and_dataset_loads_example(self) -> None:
         pilot = self.root / "pilot"
         image_path = pilot / "images" / "obstacle" / "example.png"
@@ -207,6 +272,55 @@ class SegmentationDatasetTests(unittest.TestCase):
         self.assertEqual(tuple(sample["labels"].shape), (16, 16))
         self.assertEqual(sample["labels"].dtype, torch.long)
         self.assertLessEqual(set(torch.unique(sample["labels"]).tolist()), {0, 1})
+
+    def test_audit_excludes_unknown_without_treating_it_as_training_error(self) -> None:
+        pilot = self.root / "pilot-unknown"
+        image_path = pilot / "images" / "obstacle" / "unknown.png"
+        image_path.parent.mkdir(parents=True)
+        Image.new("RGB", (32, 24), "white").save(image_path)
+        with (pilot / "pilot_manifest.csv").open(
+            "w", encoding="utf-8", newline=""
+        ) as handle:
+            writer = csv.DictWriter(
+                handle,
+                fieldnames=("annotation_filename", "local_filename", "subset", "panorama_id"),
+            )
+            writer.writeheader()
+            writer.writerow(
+                {
+                    "annotation_filename": "unknown.png",
+                    "local_filename": "obstacle/unknown.png",
+                    "subset": "Obstacle",
+                    "panorama_id": "panorama-unknown",
+                }
+            )
+        annotations = self.root / "unknown.csv"
+        with annotations.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(
+                handle,
+                fieldnames=(
+                    "filename",
+                    "circulation_path_status",
+                    "circulation_path",
+                    "image_width",
+                    "image_height",
+                ),
+            )
+            writer.writeheader()
+            writer.writerow(
+                {
+                    "filename": "unknown.png",
+                    "circulation_path_status": "unknown",
+                    "circulation_path": "[]",
+                    "image_width": 32,
+                    "image_height": 24,
+                }
+            )
+        records, issues = audit_segmentation_annotations(
+            annotations, pilot, excluded_statuses={"unknown"}
+        )
+        self.assertEqual(records, [])
+        self.assertEqual(issues, [])
 
 
 if __name__ == "__main__":

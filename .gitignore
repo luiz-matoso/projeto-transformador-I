@@ -27,7 +27,7 @@ __pycache__/
 /artifacts/**/*.png
 /artifacts/**/*.jpg
 /artifacts/**/*.jpeg
-/artifacts/segmentation/image_processor/
+/artifacts/**/image_processor/
 
 # Local execution logs.
 *.log
