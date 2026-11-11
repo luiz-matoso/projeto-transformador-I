@@ -1,9 +1,4 @@
-"""Testes unitários do classificador DINOv2 sem baixar backbone ou usar GPU."""
-
-from __future__ import annotations
-
 import csv
-import json
 import tempfile
 import unittest
 from collections import Counter

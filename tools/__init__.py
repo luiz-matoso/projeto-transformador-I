@@ -1,1 +1,0 @@
-"""Ferramentas locais do projeto."""

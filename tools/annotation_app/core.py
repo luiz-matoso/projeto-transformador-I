@@ -1,7 +1,3 @@
-"""Schema, validação e persistência do painel de anotação."""
-
-from __future__ import annotations
-
 import csv
 import json
 import math
@@ -38,15 +34,15 @@ VALID_CIRCULATION_PATH_ORIGINS = {
 
 
 class SchemaError(ValueError):
-    """Indica schema inválido ou incompatível."""
+    pass
 
 
 class AnnotationValidationError(ValueError):
-    """Indica uma anotação que não respeita o schema."""
+    pass
 
 
 class AnnotationFileError(ValueError):
-    """Indica um CSV ausente de estrutura ou com dados conflitantes."""
+    pass
 
 
 @dataclass(frozen=True)
@@ -154,9 +150,124 @@ def _require_string(value: Any, context: str) -> str:
     return value.strip()
 
 
+def _parse_options(value: Any, context: str) -> tuple[OptionDefinition, ...]:
+    if not isinstance(value, list) or not value:
+        raise SchemaError(f"{context} deve ser uma lista não vazia")
+    options: list[OptionDefinition] = []
+    for index, item in enumerate(value):
+        raw = _require_mapping(item, f"{context} opção {index}")
+        options.append(
+            OptionDefinition(
+                value=_require_string(raw.get("value"), f"{context} option.value"),
+                definition=_require_string(
+                    raw.get("definition"), f"{context} option.definition"
+                ),
+            )
+        )
+    option_values = tuple(option.value for option in options)
+    if len(option_values) != len(set(option_values)):
+        raise SchemaError(f"{context}: opções duplicadas")
+    return tuple(options)
+
+
+def _parse_field(field_name: Any, value: Any) -> FieldDefinition:
+    name = _require_string(field_name, "Nome da label")
+    context = f"Label {name}"
+    raw = _require_mapping(value, context)
+    kind = raw.get("type")
+    if kind not in {"single-label", "multilabel"}:
+        raise SchemaError(f"{context}: type deve ser single-label ou multilabel")
+
+    required = raw.get("required")
+    model_output = raw.get("model_output")
+    if not isinstance(required, bool) or not isinstance(model_output, bool):
+        raise SchemaError(f"{context}: required e model_output devem ser booleanos")
+
+    options = _parse_options(raw.get("options"), f"{context}: options")
+    option_values = tuple(option.value for option in options)
+    unknown_value = raw.get("unknown_value")
+    if unknown_value is not None:
+        unknown_value = _require_string(unknown_value, f"{context} unknown_value")
+        if unknown_value not in option_values:
+            raise SchemaError(f"{context}: unknown_value não pertence às opções")
+
+    raw_not_applicable = raw.get("not_applicable_values", [])
+    if not isinstance(raw_not_applicable, list) or any(
+        not isinstance(item, str) for item in raw_not_applicable
+    ):
+        raise SchemaError(f"{context}: not_applicable_values deve ser uma lista")
+    not_applicable = tuple(raw_not_applicable)
+    if any(item not in option_values for item in not_applicable):
+        raise SchemaError(f"{context}: not_applicable_values contém valor inválido")
+
+    empty_means = raw.get("empty_means")
+    if empty_means is not None:
+        empty_means = _require_string(empty_means, f"{context} empty_means")
+    if kind == "multilabel" and empty_means is None:
+        raise SchemaError(f"{context}: multilabel exige empty_means")
+
+    return FieldDefinition(
+        name=name,
+        display_name=_require_string(raw.get("display_name"), f"{context} display_name"),
+        kind=kind,
+        required=required,
+        model_output=model_output,
+        description=_require_string(raw.get("description"), f"{context} description"),
+        options=options,
+        unknown_value=unknown_value,
+        not_applicable_values=not_applicable,
+        empty_means=empty_means,
+    )
+
+
+def _parse_spatial_annotation(value: Any) -> SpatialAnnotationDefinition:
+    raw = _require_mapping(value, "spatial_annotation")
+    status_options = _parse_options(
+        raw.get("status_options"), "spatial_annotation.status_options"
+    )
+    if tuple(option.value for option in status_options) != (
+        "annotated",
+        "absent",
+        "unknown",
+    ):
+        raise SchemaError(
+            "spatial_annotation.status_options deve preservar annotated, absent, unknown"
+        )
+    spatial = SpatialAnnotationDefinition(
+        name=_require_string(raw.get("name"), "spatial_annotation.name"),
+        display_name=_require_string(
+            raw.get("display_name"), "spatial_annotation.display_name"
+        ),
+        description=_require_string(
+            raw.get("description"), "spatial_annotation.description"
+        ),
+        status_field=_require_string(
+            raw.get("status_field"), "spatial_annotation.status_field"
+        ),
+        geometry_field=_require_string(
+            raw.get("geometry_field"), "spatial_annotation.geometry_field"
+        ),
+        image_width_field=_require_string(
+            raw.get("image_width_field"), "spatial_annotation.image_width_field"
+        ),
+        image_height_field=_require_string(
+            raw.get("image_height_field"), "spatial_annotation.image_height_field"
+        ),
+        status_options=status_options,
+    )
+    spatial_columns = (
+        spatial.status_field,
+        spatial.geometry_field,
+        spatial.image_width_field,
+        spatial.image_height_field,
+    )
+    if spatial_columns != SPATIAL_COLUMNS:
+        raise SchemaError("Os campos espaciais não correspondem ao formato CSV v2")
+    return spatial
+
+
 def load_schema(path: str | Path) -> AnnotationSchema:
     """Carrega e valida o schema declarativo YAML."""
-
     schema_path = Path(path)
     if not schema_path.is_file():
         raise FileNotFoundError(f"Schema não encontrado: {schema_path}")
@@ -169,163 +280,20 @@ def load_schema(path: str | Path) -> AnnotationSchema:
     version = root.get("schema_version")
     if not isinstance(version, int) or isinstance(version, bool) or version < 1:
         raise SchemaError("schema_version deve ser um inteiro positivo")
-    name = _require_string(root.get("schema_name"), "schema_name")
-    description = _require_string(root.get("description"), "description")
+    if version != 3:
+        raise SchemaError("O annotation tool atual exige schema_version 3")
+
     labels = _require_mapping(root.get("labels"), "labels")
     if not labels:
         raise SchemaError("O schema deve conter ao menos uma label")
-
-    fields: list[FieldDefinition] = []
-    for field_name, raw_field_value in labels.items():
-        field_key = _require_string(field_name, "Nome da label")
-        raw_field = _require_mapping(raw_field_value, f"Label {field_key}")
-        kind = raw_field.get("type")
-        if kind not in {"single-label", "multilabel"}:
-            raise SchemaError(
-                f"Label {field_key}: type deve ser single-label ou multilabel"
-            )
-        required = raw_field.get("required")
-        model_output = raw_field.get("model_output")
-        if not isinstance(required, bool) or not isinstance(model_output, bool):
-            raise SchemaError(
-                f"Label {field_key}: required e model_output devem ser booleanos"
-            )
-
-        raw_options = raw_field.get("options")
-        if not isinstance(raw_options, list) or not raw_options:
-            raise SchemaError(f"Label {field_key}: options deve ser uma lista não vazia")
-        options: list[OptionDefinition] = []
-        for option_index, raw_option_value in enumerate(raw_options):
-            raw_option = _require_mapping(
-                raw_option_value,
-                f"Label {field_key} opção {option_index}",
-            )
-            options.append(
-                OptionDefinition(
-                    value=_require_string(
-                        raw_option.get("value"),
-                        f"Label {field_key} option.value",
-                    ),
-                    definition=_require_string(
-                        raw_option.get("definition"),
-                        f"Label {field_key} option.definition",
-                    ),
-                )
-            )
-        option_values = tuple(option.value for option in options)
-        if len(option_values) != len(set(option_values)):
-            raise SchemaError(f"Label {field_key}: opções duplicadas")
-
-        unknown_value = raw_field.get("unknown_value")
-        if unknown_value is not None:
-            unknown_value = _require_string(
-                unknown_value, f"Label {field_key} unknown_value"
-            )
-            if unknown_value not in option_values:
-                raise SchemaError(
-                    f"Label {field_key}: unknown_value não pertence às opções"
-                )
-
-        raw_not_applicable = raw_field.get("not_applicable_values", [])
-        if not isinstance(raw_not_applicable, list) or any(
-            not isinstance(value, str) for value in raw_not_applicable
-        ):
-            raise SchemaError(
-                f"Label {field_key}: not_applicable_values deve ser uma lista"
-            )
-        not_applicable_values = tuple(raw_not_applicable)
-        if any(value not in option_values for value in not_applicable_values):
-            raise SchemaError(
-                f"Label {field_key}: not_applicable_values contém valor inválido"
-            )
-
-        empty_means = raw_field.get("empty_means")
-        if empty_means is not None:
-            empty_means = _require_string(empty_means, f"Label {field_key} empty_means")
-        if kind == "multilabel" and empty_means is None:
-            raise SchemaError(f"Label {field_key}: multilabel exige empty_means")
-
-        fields.append(
-            FieldDefinition(
-                name=field_key,
-                display_name=_require_string(
-                    raw_field.get("display_name"), f"Label {field_key} display_name"
-                ),
-                kind=kind,
-                required=required,
-                model_output=model_output,
-                description=_require_string(
-                    raw_field.get("description"), f"Label {field_key} description"
-                ),
-                options=tuple(options),
-                unknown_value=unknown_value,
-                not_applicable_values=not_applicable_values,
-                empty_means=empty_means,
-            )
-        )
-
-    if version != 3:
-        raise SchemaError("O annotation tool atual exige schema_version 3")
-    raw_spatial = _require_mapping(
-        root.get("spatial_annotation"), "spatial_annotation"
+    fields = tuple(_parse_field(name, value) for name, value in labels.items())
+    schema = AnnotationSchema(
+        version=version,
+        name=_require_string(root.get("schema_name"), "schema_name"),
+        description=_require_string(root.get("description"), "description"),
+        fields=fields,
+        spatial=_parse_spatial_annotation(root.get("spatial_annotation")),
     )
-    raw_status_options = raw_spatial.get("status_options")
-    if not isinstance(raw_status_options, list) or not raw_status_options:
-        raise SchemaError("spatial_annotation.status_options deve ser uma lista")
-    status_options = tuple(
-        OptionDefinition(
-            value=_require_string(
-                _require_mapping(raw_option, "Status espacial").get("value"),
-                "Status espacial value",
-            ),
-            definition=_require_string(
-                _require_mapping(raw_option, "Status espacial").get("definition"),
-                "Status espacial definition",
-            ),
-        )
-        for raw_option in raw_status_options
-    )
-    if tuple(option.value for option in status_options) != (
-        "annotated",
-        "absent",
-        "unknown",
-    ):
-        raise SchemaError(
-            "spatial_annotation.status_options deve preservar annotated, absent, unknown"
-        )
-    spatial = SpatialAnnotationDefinition(
-        name=_require_string(raw_spatial.get("name"), "spatial_annotation.name"),
-        display_name=_require_string(
-            raw_spatial.get("display_name"), "spatial_annotation.display_name"
-        ),
-        description=_require_string(
-            raw_spatial.get("description"), "spatial_annotation.description"
-        ),
-        status_field=_require_string(
-            raw_spatial.get("status_field"), "spatial_annotation.status_field"
-        ),
-        geometry_field=_require_string(
-            raw_spatial.get("geometry_field"), "spatial_annotation.geometry_field"
-        ),
-        image_width_field=_require_string(
-            raw_spatial.get("image_width_field"),
-            "spatial_annotation.image_width_field",
-        ),
-        image_height_field=_require_string(
-            raw_spatial.get("image_height_field"),
-            "spatial_annotation.image_height_field",
-        ),
-        status_options=status_options,
-    )
-    if (
-        spatial.status_field,
-        spatial.geometry_field,
-        spatial.image_width_field,
-        spatial.image_height_field,
-    ) != SPATIAL_COLUMNS:
-        raise SchemaError("Os campos espaciais não correspondem ao formato CSV v2")
-
-    schema = AnnotationSchema(version, name, description, tuple(fields), spatial)
     try:
         confidence = schema.field("annotation_confidence")
     except KeyError as error:

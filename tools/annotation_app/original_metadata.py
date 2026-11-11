@@ -1,7 +1,3 @@
-"""Leitura dos metadados originais associados ao piloto de anotação."""
-
-from __future__ import annotations
-
 import csv
 import json
 import math

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import argparse
 import sys
 from collections.abc import Sequence
@@ -27,7 +25,7 @@ def build_predictions(
     probabilities: Tensor | Sequence[float],
     thresholds: Sequence[float],
 ) -> tuple[LabelPrediction, ...]:
-    """Associate probabilities and thresholds with TARGET_LABELS in order."""
+    """Associa probabilidades e thresholds na ordem de TARGET_LABELS."""
     probability_values = tuple(float(value) for value in probabilities)
     threshold_values = tuple(float(value) for value in thresholds)
 
@@ -60,7 +58,7 @@ def build_predictions(
 
 
 def load_image_tensor(image_path: str | Path) -> Tensor:
-    """Load one image with the deterministic transform used for test data."""
+    """Carrega uma imagem com a transformação determinística do teste."""
     path = Path(image_path)
     if not path.is_file():
         raise FileNotFoundError(f"Imagem não encontrada: {path}")
@@ -80,7 +78,7 @@ def predict_image(
     checkpoint_path: str | Path = DEFAULT_CHECKPOINT,
     device: torch.device | None = None,
 ) -> tuple[LabelPrediction, ...]:
-    """Run multilabel inference for a single image."""
+    """Executa inferência multilabel em uma imagem."""
     checkpoint = Path(checkpoint_path)
     if not checkpoint.is_file():
         raise FileNotFoundError(f"Checkpoint não encontrado: {checkpoint}")

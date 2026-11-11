@@ -1,23 +1,7 @@
-from __future__ import annotations
-
 from collections.abc import Iterable
 from dataclasses import dataclass
-from enum import IntEnum
 
 from ml.data.obstacles import TARGET_LABELS
-
-
-class Impact(IntEnum):
-    BAIXO = 1
-    MODERADO = 2
-    ALTO = 3
-
-
-@dataclass(frozen=True)
-class FeatureRule:
-    display_name: str
-    impact: Impact
-
 
 @dataclass(frozen=True)
 class TransitabilityResult:
@@ -26,29 +10,26 @@ class TransitabilityResult:
     justification: str
 
 
-# Configuração única das características consideradas pelo MVP0.
-FEATURE_RULES: dict[str, FeatureRule] = {
-    "construction": FeatureRule("obra", Impact.ALTO),
-    "height-difference": FeatureRule("desnível", Impact.ALTO),
-    "parked-car": FeatureRule("veículo estacionado", Impact.MODERADO),
-    "pole": FeatureRule("poste", Impact.MODERADO),
-    "trash-recycling-can": FeatureRule(
-        "lixeira ou recipiente de reciclagem",
-        Impact.MODERADO,
-    ),
-    "tree": FeatureRule("árvore", Impact.BAIXO),
-    "vegetation": FeatureRule("vegetação", Impact.BAIXO),
+FEATURE_RULES: dict[str, tuple[str, str]] = {
+    "construction": ("obra", "alto"),
+    "height-difference": ("desnível", "alto"),
+    "parked-car": ("veículo estacionado", "moderado"),
+    "pole": ("poste", "moderado"),
+    "trash-recycling-can": ("lixeira ou recipiente de reciclagem", "moderado"),
+    "tree": ("árvore", "baixo"),
+    "vegetation": ("vegetação", "baixo"),
 }
 
-CLASSIFICATION_BY_MAX_IMPACT: dict[Impact, str] = {
-    Impact.BAIXO: "Transitável",
-    Impact.MODERADO: "Parcialmente transitável",
-    Impact.ALTO: "Não transitável",
+CLASSIFICATION_BY_IMPACT = {
+    "baixo": "Transitável",
+    "moderado": "Parcialmente transitável",
+    "alto": "Não transitável",
 }
+IMPACT_RANK = {"baixo": 1, "moderado": 2, "alto": 3}
 
 
 class UnknownFeatureError(ValueError):
-    """Raised when transitability receives a feature outside the MVP0 labels."""
+    pass
 
 
 def _format_feature_list(names: list[str]) -> str:
@@ -60,7 +41,7 @@ def _format_feature_list(names: list[str]) -> str:
 def classify_transitability(
     detected_features: Iterable[str],
 ) -> TransitabilityResult:
-    """Classify transitability from detected features and their maximum impact."""
+    """Classifica o trecho pelo maior impacto entre as características detectadas."""
     features = tuple(dict.fromkeys(detected_features))
     unknown_features = tuple(
         feature for feature in features if feature not in FEATURE_RULES
@@ -80,12 +61,15 @@ def classify_transitability(
             ),
         )
 
-    maximum_impact = max(FEATURE_RULES[feature].impact for feature in features)
-    friendly_names = [FEATURE_RULES[feature].display_name for feature in features]
+    maximum_impact = max(
+        (FEATURE_RULES[feature][1] for feature in features),
+        key=IMPACT_RANK.__getitem__,
+    )
+    friendly_names = [FEATURE_RULES[feature][0] for feature in features]
     formatted_names = _format_feature_list(friendly_names)
 
     return TransitabilityResult(
-        classification=CLASSIFICATION_BY_MAX_IMPACT[maximum_impact],
+        classification=CLASSIFICATION_BY_IMPACT[maximum_impact],
         detected_features=features,
         justification=(
             "Foram identificadas as seguintes características no trecho: "

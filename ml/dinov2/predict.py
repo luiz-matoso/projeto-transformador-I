@@ -1,7 +1,3 @@
-"""Inferência DINOv2 isolada com máscara ou polygon de circulação fornecido."""
-
-from __future__ import annotations
-
 import argparse
 import json
 from pathlib import Path
@@ -94,7 +90,9 @@ def predict_image(model, processor, classes, thresholds, device, image: Image.Im
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description="Executa inferência DINOv2 com uma região de circulação."
+    )
     parser.add_argument("--image", required=True, type=Path)
     region = parser.add_mutually_exclusive_group(required=True)
     region.add_argument("--mask", type=Path)

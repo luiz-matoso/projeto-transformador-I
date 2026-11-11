@@ -1,7 +1,3 @@
-"""Testes rápidos do modelo, treino e métricas do MVP0."""
-
-from __future__ import annotations
-
 import io
 import math
 import tempfile

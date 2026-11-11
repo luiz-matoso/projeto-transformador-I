@@ -1,7 +1,3 @@
-"""Interface Streamlit compacta para anotar características de transitabilidade."""
-
-from __future__ import annotations
-
 from pathlib import Path
 from typing import Any
 

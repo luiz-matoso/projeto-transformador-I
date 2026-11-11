@@ -1,5 +1,3 @@
-"""Classificador multitarefa DINOv2 para características de transitabilidade."""
-
 MODEL_NAME = "facebook/dinov2-base"
 
 CATEGORICAL_HEADS = (

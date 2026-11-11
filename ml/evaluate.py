@@ -1,7 +1,3 @@
-"""Avaliação multilabel do checkpoint produzido pelo MVP0."""
-
-from __future__ import annotations
-
 import argparse
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -19,8 +15,6 @@ DEFAULT_CHECKPOINT = Path("best_model.pt")
 
 @dataclass(frozen=True)
 class LabelMetrics:
-    """Métricas binárias de uma label."""
-
     label: str
     threshold: float
     precision: float
@@ -149,8 +143,6 @@ def evaluate_model(
 
 
 def print_metrics(metrics: Sequence[LabelMetrics]) -> None:
-    """Exibe métricas por label e macro F1."""
-
     print(
         f"{'Label':<24} {'Threshold':>10} {'Precision':>10} "
         f"{'Recall':>10} {'F1':>10}"

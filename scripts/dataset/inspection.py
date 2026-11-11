@@ -1,7 +1,3 @@
-"""Inspeção somente-leitura dos CSVs do dataset de obstáculos."""
-
-from __future__ import annotations
-
 import csv
 import math
 from collections import Counter
@@ -15,8 +11,6 @@ MISSING_VALUES = frozenset({"", "na", "n/a", "nan", "null", "none"})
 
 @dataclass(frozen=True)
 class LabelStatistics:
-    """Contagem de ocorrências positivas de uma label."""
-
     name: str
     positives: int
     percentage: float
@@ -24,8 +18,6 @@ class LabelStatistics:
 
 @dataclass(frozen=True)
 class PositiveExample:
-    """Amostra positiva, com os metadados úteis para revisão humana."""
-
     filename: str
     normalized_x: str
     normalized_y: str
@@ -34,8 +26,6 @@ class PositiveExample:
 
 @dataclass
 class DatasetReport:
-    """Resultado estruturado da inspeção de um arquivo CSV."""
-
     path: Path
     sample_count: int = 0
     columns: tuple[str, ...] = ()
@@ -52,8 +42,6 @@ class DatasetReport:
 
     @property
     def label_statistics(self) -> tuple[LabelStatistics, ...]:
-        """Retorna estatísticas das labels na mesma ordem do cabeçalho."""
-
         return tuple(
             LabelStatistics(
                 name=label,
@@ -91,8 +79,6 @@ class DatasetReport:
 
     @property
     def duplicate_filenames(self) -> dict[str, int]:
-        """Filenames repetidos e sua quantidade total de ocorrências."""
-
         return {
             filename: count
             for filename, count in self.filename_counts.items()
@@ -101,8 +87,6 @@ class DatasetReport:
 
     @property
     def duplicate_occurrence_count(self) -> int:
-        """Quantidade de linhas excedentes causada por filenames repetidos."""
-
         return sum(count - 1 for count in self.duplicate_filenames.values())
 
     @property

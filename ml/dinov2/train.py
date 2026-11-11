@@ -1,7 +1,3 @@
-"""Treino do baseline DINOv2-B/14 congelado com sete heads independentes."""
-
-from __future__ import annotations
-
 import argparse
 import csv
 import json
@@ -333,8 +329,7 @@ def _write_predictions(
     # na mesma ordem usando um cursor apenas sobre amostras válidas.
     for head in CATEGORICAL_HEADS:
         cursor = 0
-        valid_targets = raw["categorical_targets"][head]
-        probabilities = raw["categorical_probabilities"][head]
+        expected_predictions = len(raw["categorical_targets"][head])
         # O test usado nesta versão pode conter unknown; marcação explícita evita
         # fabricar ground truth. A ordem válida é preenchida pelo mapa auxiliar.
         for row in rows:
@@ -351,7 +346,7 @@ def _write_predictions(
             row[f"{head}_prediction"] = classes[head][prediction]
             row[f"{head}_confidence"] = f"{float(probs[prediction]):.8f}"
             cursor += 1
-        if cursor != len(valid_targets):
+        if cursor != expected_predictions:
             raise RuntimeError(f"Falha ao alinhar predições categóricas de {head}")
     for head in MULTILABEL_HEADS:
         for index, row in enumerate(rows):
@@ -454,7 +449,7 @@ def _write_error_analysis(
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
-def prepare_dataset(args) -> tuple[list[DinoRecord], dict, Counter, dict, dict]:
+def prepare_dataset(args) -> tuple[list[DinoRecord], dict, dict]:
     records, classes, statuses = load_dinov2_records(
         args.annotations, args.pilot_root, args.schema
     )
@@ -465,13 +460,15 @@ def prepare_dataset(args) -> tuple[list[DinoRecord], dict, Counter, dict, dict]:
     write_dataset_analysis(
         args.output / "dataset_analysis.md", records, classes, statuses, assignments
     )
-    return records, classes, statuses, assignments, splits
+    return records, classes, splits
 
 
 def main() -> int:
     from transformers import AutoImageProcessor
 
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description="Treina o baseline DINOv2 multitarefa."
+    )
     parser.add_argument("--annotations", type=Path, default=Path("annotations/transitability_annotations.csv"))
     parser.add_argument("--pilot-root", type=Path, default=Path("data/annotation-pilot"))
     parser.add_argument("--schema", type=Path, default=Path("annotations/annotation-schema.yaml"))
@@ -485,7 +482,7 @@ def main() -> int:
     parser.add_argument("--prepare-only", action="store_true")
     args = parser.parse_args()
 
-    records, classes, statuses, assignments, splits = prepare_dataset(args)
+    records, classes, splits = prepare_dataset(args)
     print(
         f"Dataset: {len(records)} utilizáveis | train={len(splits['train'])} "
         f"validation={len(splits['validation'])} test={len(splits['test'])}",
@@ -633,7 +630,7 @@ def main() -> int:
 
     checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=True)
     model.heads.load_state_dict(checkpoint["heads_state_dict"])
-    validation_loss, _, validation_raw = evaluate_model(
+    _, _, validation_raw = evaluate_model(
         model,
         loaders["validation"],
         device,
@@ -673,21 +670,18 @@ def main() -> int:
         json.dumps(test_metrics_payload, indent=2, ensure_ascii=False), encoding="utf-8"
     )
     _write_per_head_metrics(args.output / "per_head_metrics.csv", test_metrics)
-    # Mapa categórico por filename para preservar corretamente unknown mascarado.
     test_raw["categorical_by_filename"] = {head: {} for head in CATEGORICAL_HEADS}
-    for record in splits["test"]:
-        for head in CATEGORICAL_HEADS:
+    for head in CATEGORICAL_HEADS:
+        position = 0
+        for record in splits["test"]:
             value = record.categorical[head]
             if value is None:
                 continue
-            position = sum(
-                previous.categorical[head] is not None
-                for previous in splits["test"][: splits["test"].index(record)]
-            )
             test_raw["categorical_by_filename"][head][record.filename] = (
                 classes[head].index(value),
                 test_raw["categorical_probabilities"][head][position],
             )
+            position += 1
     _write_predictions(
         args.output / "test_predictions.csv", test_raw, classes, thresholds
     )
