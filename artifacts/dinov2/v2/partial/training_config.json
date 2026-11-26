@@ -1,0 +1,176 @@
+{
+  "heads_lr": 0.0001,
+  "backbone_lr": 1e-05,
+  "heads_weight_decay": 0.01,
+  "backbone_weight_decay": 0.05,
+  "batch_size": 8,
+  "max_epochs": 30,
+  "early_stopping_patience": 5,
+  "gradient_clip": 1.0,
+  "amp": true,
+  "seed": 42,
+  "warmup_epochs": 2,
+  "scheduler": "cosine",
+  "dropout": 0.3,
+  "label_smoothing": 0.05,
+  "max_pos_weight": 8.0,
+  "mode": "partial",
+  "model_name": "facebook/dinov2-base",
+  "split": "artifacts\\dinov2\\v1\\splits.csv",
+  "selection_metric": "validation aggregate macro F1 at 0.5",
+  "classes": {
+    "passage_width": [
+      "wide",
+      "adequate",
+      "narrow",
+      "very_narrow",
+      "blocked"
+    ],
+    "obstruction": [
+      "none",
+      "partial",
+      "full"
+    ],
+    "surface_condition": [
+      "regular",
+      "minor_problem",
+      "major_problem"
+    ],
+    "level_change": [
+      "none",
+      "minor",
+      "step"
+    ],
+    "path_continuity": [
+      "continuous",
+      "restricted",
+      "interrupted"
+    ],
+    "obstacle_type": [
+      "pole",
+      "sign",
+      "tree",
+      "vegetation",
+      "construction",
+      "litter_debris",
+      "utility"
+    ],
+    "surface_obstacle": [
+      "cracks",
+      "bumpy",
+      "uneven_slanted",
+      "height_difference",
+      "very_broken",
+      "grass",
+      "sand_gravel"
+    ]
+  },
+  "excluded_targets": {
+    "obstacle_type": {
+      "vehicle": {
+        "positive_train": 4,
+        "reason": "insufficient_support"
+      },
+      "bike_scooter": {
+        "positive_train": 5,
+        "reason": "insufficient_support"
+      },
+      "trash_container": {
+        "positive_train": 4,
+        "reason": "insufficient_support"
+      },
+      "stairs": {
+        "positive_train": 7,
+        "reason": "insufficient_support"
+      },
+      "street_furniture": {
+        "positive_train": 3,
+        "reason": "insufficient_support"
+      },
+      "other": {
+        "positive_train": 4,
+        "reason": "insufficient_support"
+      }
+    },
+    "surface_obstacle": {
+      "brick_cobblestone": {
+        "positive_train": 4,
+        "reason": "insufficient_support"
+      },
+      "pooled_water": {
+        "positive_train": 1,
+        "reason": "insufficient_support"
+      },
+      "rail_track": {
+        "positive_train": 1,
+        "reason": "insufficient_support"
+      },
+      "utility_panel": {
+        "positive_train": 0,
+        "reason": "insufficient_support"
+      },
+      "debris": {
+        "positive_train": 1,
+        "reason": "insufficient_support"
+      },
+      "other": {
+        "positive_train": 1,
+        "reason": "insufficient_support"
+      }
+    }
+  },
+  "statuses": {
+    "annotated": 192,
+    "unknown": 8
+  },
+  "categorical_weights": {
+    "passage_width": [
+      1.7256238460540771,
+      0.8878262042999268,
+      0.6683312654495239,
+      1.3835771083831787,
+      1.2555757761001587
+    ],
+    "obstruction": [
+      1.0987298488616943,
+      0.7988086342811584,
+      1.2862040996551514
+    ],
+    "surface_condition": [
+      0.9268087148666382,
+      0.8700931668281555,
+      1.3935669660568237
+    ],
+    "level_change": [
+      0.6585263609886169,
+      1.5752719640731812,
+      1.8536174297332764
+    ],
+    "path_continuity": [
+      0.7292091846466064,
+      1.4248870611190796,
+      1.263027310371399
+    ]
+  },
+  "multilabel_weights": {
+    "obstacle_type": [
+      1.7494587898254395,
+      2.7156951427459717,
+      2.9277000427246094,
+      1.7149858474731445,
+      2.9277000427246094,
+      3.3439226150512695,
+      2.7156951427459717
+    ],
+    "surface_obstacle": [
+      1.589438796043396,
+      1.4301939010620117,
+      1.785357117652893,
+      3.0508511066436768,
+      3.3439226150512695,
+      1.589438796043396,
+      3.3439226150512695
+    ]
+  },
+  "warmup_schedule": "epoch 1: 0.5 LR; epoch 2: 1.0 LR; cosine thereafter"
+}

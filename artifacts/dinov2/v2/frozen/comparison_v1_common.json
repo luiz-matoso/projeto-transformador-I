@@ -1,0 +1,850 @@
+{
+  "v1_common": {
+    "aggregate_macro_f1": 0.31702713989325737,
+    "heads": {
+      "passage_width": {
+        "macro_f1": 0.26315789473684215,
+        "weighted_f1": 0.18733615648316193,
+        "accuracy": 0.2413793103448276,
+        "per_class": {
+          "wide": {
+            "support": 1,
+            "precision": 0.2,
+            "recall": 1.0,
+            "f1": 0.33333333333333337
+          },
+          "adequate": {
+            "support": 7,
+            "precision": 0.25,
+            "recall": 0.42857142857142855,
+            "f1": 0.3157894736842105
+          },
+          "narrow": {
+            "support": 13,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "very_narrow": {
+            "support": 3,
+            "precision": 0.16666666666666666,
+            "recall": 0.3333333333333333,
+            "f1": 0.2222222222222222
+          },
+          "blocked": {
+            "support": 5,
+            "precision": 0.5,
+            "recall": 0.4,
+            "f1": 0.4444444444444445
+          }
+        },
+        "confusion_matrix": [
+          [
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            2,
+            2,
+            0
+          ],
+          [
+            4,
+            5,
+            0,
+            3,
+            1
+          ],
+          [
+            0,
+            1,
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            3,
+            0,
+            0,
+            2
+          ]
+        ],
+        "class_order": [
+          "wide",
+          "adequate",
+          "narrow",
+          "very_narrow",
+          "blocked"
+        ],
+        "valid_samples": 29
+      },
+      "obstruction": {
+        "macro_f1": 0.18803418803418803,
+        "weighted_f1": 0.3890362511052166,
+        "accuracy": 0.3793103448275862,
+        "per_class": {
+          "none": {
+            "support": 3,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "partial": {
+            "support": 20,
+            "precision": 0.5789473684210527,
+            "recall": 0.55,
+            "f1": 0.5641025641025641
+          },
+          "full": {
+            "support": 6,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            3,
+            0
+          ],
+          [
+            8,
+            11,
+            1
+          ],
+          [
+            1,
+            5,
+            0
+          ]
+        ],
+        "class_order": [
+          "none",
+          "partial",
+          "full"
+        ],
+        "valid_samples": 29
+      },
+      "surface_condition": {
+        "macro_f1": 0.44689754689754685,
+        "weighted_f1": 0.48395282878041496,
+        "accuracy": 0.5172413793103449,
+        "per_class": {
+          "regular": {
+            "support": 8,
+            "precision": 0.25,
+            "recall": 0.125,
+            "f1": 0.16666666666666666
+          },
+          "minor_problem": {
+            "support": 15,
+            "precision": 0.55,
+            "recall": 0.7333333333333333,
+            "f1": 0.6285714285714286
+          },
+          "major_problem": {
+            "support": 6,
+            "precision": 0.6,
+            "recall": 0.5,
+            "f1": 0.5454545454545454
+          }
+        },
+        "confusion_matrix": [
+          [
+            1,
+            7,
+            0
+          ],
+          [
+            2,
+            11,
+            2
+          ],
+          [
+            1,
+            2,
+            3
+          ]
+        ],
+        "class_order": [
+          "regular",
+          "minor_problem",
+          "major_problem"
+        ],
+        "valid_samples": 29
+      },
+      "level_change": {
+        "macro_f1": 0.24999999999999997,
+        "weighted_f1": 0.4821428571428571,
+        "accuracy": 0.5357142857142857,
+        "per_class": {
+          "none": {
+            "support": 18,
+            "precision": 0.6818181818181818,
+            "recall": 0.8333333333333334,
+            "f1": 0.7499999999999999
+          },
+          "minor": {
+            "support": 5,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "step": {
+            "support": 5,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            15,
+            2,
+            1
+          ],
+          [
+            3,
+            0,
+            2
+          ],
+          [
+            4,
+            1,
+            0
+          ]
+        ],
+        "class_order": [
+          "none",
+          "minor",
+          "step"
+        ],
+        "valid_samples": 28
+      },
+      "path_continuity": {
+        "macro_f1": 0.3434959349593496,
+        "weighted_f1": 0.5463850174216028,
+        "accuracy": 0.6071428571428571,
+        "per_class": {
+          "continuous": {
+            "support": 18,
+            "precision": 0.6956521739130435,
+            "recall": 0.8888888888888888,
+            "f1": 0.7804878048780488
+          },
+          "restricted": {
+            "support": 5,
+            "precision": 0.3333333333333333,
+            "recall": 0.2,
+            "f1": 0.25
+          },
+          "interrupted": {
+            "support": 5,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            16,
+            1,
+            1
+          ],
+          [
+            3,
+            1,
+            1
+          ],
+          [
+            4,
+            1,
+            0
+          ]
+        ],
+        "class_order": [
+          "continuous",
+          "restricted",
+          "interrupted"
+        ],
+        "valid_samples": 28
+      },
+      "obstacle_type": {
+        "macro_f1": 0.306766039749233,
+        "micro_f1": 0.33333333333333337,
+        "precision": 0.22972972972972974,
+        "recall": 0.6071428571428571,
+        "per_label": {
+          "pole": {
+            "support": 6,
+            "precision": 0.2777777777777778,
+            "recall": 0.8333333333333334,
+            "f1": 0.4166666666666667,
+            "threshold": 0.5
+          },
+          "sign": {
+            "support": 4,
+            "precision": 0.3,
+            "recall": 0.75,
+            "f1": 0.4285714285714285,
+            "threshold": 0.5
+          },
+          "tree": {
+            "support": 2,
+            "precision": 0.07142857142857142,
+            "recall": 0.5,
+            "f1": 0.125,
+            "threshold": 0.5
+          },
+          "vegetation": {
+            "support": 7,
+            "precision": 0.5,
+            "recall": 0.7142857142857143,
+            "f1": 0.588235294117647,
+            "threshold": 0.5
+          },
+          "construction": {
+            "support": 2,
+            "precision": 0.125,
+            "recall": 0.5,
+            "f1": 0.2,
+            "threshold": 0.5
+          },
+          "litter_debris": {
+            "support": 2,
+            "precision": 0.1,
+            "recall": 0.5,
+            "f1": 0.16666666666666669,
+            "threshold": 0.5
+          },
+          "utility": {
+            "support": 5,
+            "precision": 0.25,
+            "recall": 0.2,
+            "f1": 0.22222222222222224,
+            "threshold": 0.5
+          }
+        },
+        "thresholds": {
+          "pole": 0.5,
+          "sign": 0.5,
+          "tree": 0.5,
+          "vegetation": 0.5,
+          "construction": 0.5,
+          "litter_debris": 0.5,
+          "utility": 0.5
+        },
+        "samples": 29
+      },
+      "surface_obstacle": {
+        "macro_f1": 0.42083837487564196,
+        "micro_f1": 0.5,
+        "precision": 0.4025974025974026,
+        "recall": 0.6595744680851063,
+        "per_label": {
+          "cracks": {
+            "support": 11,
+            "precision": 0.6666666666666666,
+            "recall": 0.7272727272727273,
+            "f1": 0.6956521739130435,
+            "threshold": 0.5
+          },
+          "bumpy": {
+            "support": 12,
+            "precision": 0.5,
+            "recall": 0.6666666666666666,
+            "f1": 0.5714285714285715,
+            "threshold": 0.5
+          },
+          "uneven_slanted": {
+            "support": 6,
+            "precision": 0.3333333333333333,
+            "recall": 0.5,
+            "f1": 0.4,
+            "threshold": 0.5
+          },
+          "height_difference": {
+            "support": 5,
+            "precision": 0.26666666666666666,
+            "recall": 0.8,
+            "f1": 0.4,
+            "threshold": 0.5
+          },
+          "very_broken": {
+            "support": 2,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "threshold": 0.5
+          },
+          "grass": {
+            "support": 8,
+            "precision": 0.42857142857142855,
+            "recall": 0.75,
+            "f1": 0.5454545454545454,
+            "threshold": 0.5
+          },
+          "sand_gravel": {
+            "support": 3,
+            "precision": 0.2222222222222222,
+            "recall": 0.6666666666666666,
+            "f1": 0.3333333333333333,
+            "threshold": 0.5
+          }
+        },
+        "thresholds": {
+          "cracks": 0.5,
+          "bumpy": 0.5,
+          "uneven_slanted": 0.5,
+          "height_difference": 0.5,
+          "very_broken": 0.5,
+          "grass": 0.5,
+          "sand_gravel": 0.5
+        },
+        "samples": 29
+      }
+    },
+    "threshold": 0.5
+  },
+  "v2_frozen": {
+    "aggregate_macro_f1": 0.26815788172649424,
+    "heads": {
+      "passage_width": {
+        "macro_f1": 0.18015873015873016,
+        "weighted_f1": 0.25629447181171316,
+        "accuracy": 0.27586206896551724,
+        "per_class": {
+          "wide": {
+            "support": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "adequate": {
+            "support": 7,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          },
+          "narrow": {
+            "support": 13,
+            "precision": 0.4,
+            "recall": 0.46153846153846156,
+            "f1": 0.42857142857142855
+          },
+          "very_narrow": {
+            "support": 3,
+            "precision": 0.2,
+            "recall": 0.3333333333333333,
+            "f1": 0.25
+          },
+          "blocked": {
+            "support": 5,
+            "precision": 0.25,
+            "recall": 0.2,
+            "f1": 0.22222222222222224
+          }
+        },
+        "confusion_matrix": [
+          [
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            7,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            6,
+            3,
+            2
+          ],
+          [
+            0,
+            0,
+            1,
+            1,
+            1
+          ],
+          [
+            0,
+            3,
+            1,
+            0,
+            1
+          ]
+        ],
+        "class_order": [
+          "wide",
+          "adequate",
+          "narrow",
+          "very_narrow",
+          "blocked"
+        ],
+        "valid_samples": 29
+      },
+      "obstruction": {
+        "macro_f1": 0.29689608636977055,
+        "weighted_f1": 0.5240820885104005,
+        "accuracy": 0.5172413793103449,
+        "per_class": {
+          "none": {
+            "support": 3,
+            "precision": 0.1,
+            "recall": 0.3333333333333333,
+            "f1": 0.15384615384615383
+          },
+          "partial": {
+            "support": 20,
+            "precision": 0.7777777777777778,
+            "recall": 0.7,
+            "f1": 0.7368421052631577
+          },
+          "full": {
+            "support": 6,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            5,
+            14,
+            1
+          ],
+          [
+            4,
+            2,
+            0
+          ]
+        ],
+        "class_order": [
+          "none",
+          "partial",
+          "full"
+        ],
+        "valid_samples": 29
+      },
+      "surface_condition": {
+        "macro_f1": 0.2891712038717483,
+        "weighted_f1": 0.3724888916703173,
+        "accuracy": 0.3793103448275862,
+        "per_class": {
+          "regular": {
+            "support": 8,
+            "precision": 0.2727272727272727,
+            "recall": 0.375,
+            "f1": 0.3157894736842105
+          },
+          "minor_problem": {
+            "support": 15,
+            "precision": 0.5714285714285714,
+            "recall": 0.5333333333333333,
+            "f1": 0.5517241379310344
+          },
+          "major_problem": {
+            "support": 6,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "confusion_matrix": [
+          [
+            3,
+            3,
+            2
+          ],
+          [
+            5,
+            8,
+            2
+          ],
+          [
+            3,
+            3,
+            0
+          ]
+        ],
+        "class_order": [
+          "regular",
+          "minor_problem",
+          "major_problem"
+        ],
+        "valid_samples": 29
+      },
+      "level_change": {
+        "macro_f1": 0.35046296296296303,
+        "weighted_f1": 0.44890873015873023,
+        "accuracy": 0.42857142857142855,
+        "per_class": {
+          "none": {
+            "support": 18,
+            "precision": 0.6428571428571429,
+            "recall": 0.5,
+            "f1": 0.5625000000000001
+          },
+          "minor": {
+            "support": 5,
+            "precision": 0.2,
+            "recall": 0.4,
+            "f1": 0.26666666666666666
+          },
+          "step": {
+            "support": 5,
+            "precision": 0.25,
+            "recall": 0.2,
+            "f1": 0.22222222222222224
+          }
+        },
+        "confusion_matrix": [
+          [
+            9,
+            7,
+            2
+          ],
+          [
+            2,
+            2,
+            1
+          ],
+          [
+            3,
+            1,
+            1
+          ]
+        ],
+        "class_order": [
+          "none",
+          "minor",
+          "step"
+        ],
+        "valid_samples": 28
+      },
+      "path_continuity": {
+        "macro_f1": 0.351048951048951,
+        "weighted_f1": 0.44130869130869127,
+        "accuracy": 0.42857142857142855,
+        "per_class": {
+          "continuous": {
+            "support": 18,
+            "precision": 0.6,
+            "recall": 0.5,
+            "f1": 0.5454545454545454
+          },
+          "restricted": {
+            "support": 5,
+            "precision": 0.25,
+            "recall": 0.4,
+            "f1": 0.3076923076923077
+          },
+          "interrupted": {
+            "support": 5,
+            "precision": 0.2,
+            "recall": 0.2,
+            "f1": 0.20000000000000004
+          }
+        },
+        "confusion_matrix": [
+          [
+            9,
+            6,
+            3
+          ],
+          [
+            2,
+            2,
+            1
+          ],
+          [
+            4,
+            0,
+            1
+          ]
+        ],
+        "class_order": [
+          "continuous",
+          "restricted",
+          "interrupted"
+        ],
+        "valid_samples": 28
+      },
+      "obstacle_type": {
+        "macro_f1": 0.2022088187501721,
+        "micro_f1": 0.2758620689655173,
+        "precision": 0.2033898305084746,
+        "recall": 0.42857142857142855,
+        "per_label": {
+          "pole": {
+            "support": 6,
+            "precision": 0.2,
+            "recall": 0.6666666666666666,
+            "f1": 0.30769230769230765,
+            "threshold": 0.5
+          },
+          "sign": {
+            "support": 4,
+            "precision": 0.5,
+            "recall": 0.25,
+            "f1": 0.3333333333333333,
+            "threshold": 0.5
+          },
+          "tree": {
+            "support": 2,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "threshold": 0.5
+          },
+          "vegetation": {
+            "support": 7,
+            "precision": 0.5,
+            "recall": 0.8571428571428571,
+            "f1": 0.631578947368421,
+            "threshold": 0.5
+          },
+          "construction": {
+            "support": 2,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "threshold": 0.5
+          },
+          "litter_debris": {
+            "support": 2,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "threshold": 0.5
+          },
+          "utility": {
+            "support": 5,
+            "precision": 0.1111111111111111,
+            "recall": 0.2,
+            "f1": 0.14285714285714285,
+            "threshold": 0.5
+          }
+        },
+        "thresholds": {
+          "pole": 0.5,
+          "sign": 0.5,
+          "tree": 0.5,
+          "vegetation": 0.5,
+          "construction": 0.5,
+          "litter_debris": 0.5,
+          "utility": 0.5
+        },
+        "samples": 29
+      },
+      "surface_obstacle": {
+        "macro_f1": 0.2071584189231248,
+        "micro_f1": 0.2736842105263158,
+        "precision": 0.2708333333333333,
+        "recall": 0.2765957446808511,
+        "per_label": {
+          "cracks": {
+            "support": 11,
+            "precision": 0.3333333333333333,
+            "recall": 0.18181818181818182,
+            "f1": 0.23529411764705885,
+            "threshold": 0.5
+          },
+          "bumpy": {
+            "support": 12,
+            "precision": 0.5333333333333333,
+            "recall": 0.6666666666666666,
+            "f1": 0.5925925925925926,
+            "threshold": 0.5
+          },
+          "uneven_slanted": {
+            "support": 6,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "threshold": 0.5
+          },
+          "height_difference": {
+            "support": 5,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "threshold": 0.5
+          },
+          "very_broken": {
+            "support": 2,
+            "precision": 0.3333333333333333,
+            "recall": 0.5,
+            "f1": 0.4,
+            "threshold": 0.5
+          },
+          "grass": {
+            "support": 8,
+            "precision": 0.2,
+            "recall": 0.25,
+            "f1": 0.22222222222222224,
+            "threshold": 0.5
+          },
+          "sand_gravel": {
+            "support": 3,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "threshold": 0.5
+          }
+        },
+        "thresholds": {
+          "cracks": 0.5,
+          "bumpy": 0.5,
+          "uneven_slanted": 0.5,
+          "height_difference": 0.5,
+          "very_broken": 0.5,
+          "grass": 0.5,
+          "sand_gravel": 0.5
+        },
+        "samples": 29
+      }
+    },
+    "threshold": 0.5,
+    "losses": {
+      "loss": 1.2039116621017456,
+      "passage_width": 1.8074769316048458,
+      "obstruction": 1.1294017721866738,
+      "surface_condition": 1.3922114865533237,
+      "level_change": 1.2084449295486723,
+      "path_continuity": 1.2278181101594652,
+      "obstacle_type": 0.7964661080261757,
+      "surface_obstacle": 0.8583104281589903
+    }
+  },
+  "aggregate_delta": -0.04886925816676313,
+  "head_deltas": {
+    "passage_width": -0.08299916457811199,
+    "obstruction": 0.10886189833558252,
+    "surface_condition": -0.15772634302579858,
+    "level_change": 0.10046296296296306,
+    "path_continuity": 0.007553016089601405,
+    "obstacle_type": -0.1045572209990609,
+    "surface_obstacle": -0.21367995595251715
+  }
+}

@@ -31,3 +31,5 @@ __pycache__/
 
 # Local execution logs.
 *.log
+
+/artifacts/dinov2/v2/**/best_dinov2_v2.pt

@@ -1,0 +1,103 @@
+{
+  "modeled": {
+    "passage_width": [
+      "wide",
+      "adequate",
+      "narrow",
+      "very_narrow",
+      "blocked"
+    ],
+    "obstruction": [
+      "none",
+      "partial",
+      "full"
+    ],
+    "surface_condition": [
+      "regular",
+      "minor_problem",
+      "major_problem"
+    ],
+    "level_change": [
+      "none",
+      "minor",
+      "step"
+    ],
+    "path_continuity": [
+      "continuous",
+      "restricted",
+      "interrupted"
+    ],
+    "obstacle_type": [
+      "pole",
+      "sign",
+      "tree",
+      "vegetation",
+      "construction",
+      "litter_debris",
+      "utility"
+    ],
+    "surface_obstacle": [
+      "cracks",
+      "bumpy",
+      "uneven_slanted",
+      "height_difference",
+      "very_broken",
+      "grass",
+      "sand_gravel"
+    ]
+  },
+  "not_modeled": {
+    "obstacle_type": {
+      "vehicle": {
+        "positive_train": 4,
+        "reason": "insufficient_support"
+      },
+      "bike_scooter": {
+        "positive_train": 5,
+        "reason": "insufficient_support"
+      },
+      "trash_container": {
+        "positive_train": 4,
+        "reason": "insufficient_support"
+      },
+      "stairs": {
+        "positive_train": 7,
+        "reason": "insufficient_support"
+      },
+      "street_furniture": {
+        "positive_train": 3,
+        "reason": "insufficient_support"
+      },
+      "other": {
+        "positive_train": 4,
+        "reason": "insufficient_support"
+      }
+    },
+    "surface_obstacle": {
+      "brick_cobblestone": {
+        "positive_train": 4,
+        "reason": "insufficient_support"
+      },
+      "pooled_water": {
+        "positive_train": 1,
+        "reason": "insufficient_support"
+      },
+      "rail_track": {
+        "positive_train": 1,
+        "reason": "insufficient_support"
+      },
+      "utility_panel": {
+        "positive_train": 0,
+        "reason": "insufficient_support"
+      },
+      "debris": {
+        "positive_train": 1,
+        "reason": "insufficient_support"
+      },
+      "other": {
+        "positive_train": 1,
+        "reason": "insufficient_support"
+      }
+    }
+  }
+}

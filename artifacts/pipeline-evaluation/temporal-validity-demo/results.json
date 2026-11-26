@@ -1,0 +1,943 @@
+{
+  "source_predictions": "artifacts\\pipeline-evaluation\\mobility-engine-v1\\results.json",
+  "timestamps_simulated": true,
+  "note": "Previsões reais já registradas; horários hipotéticos de demonstração, não datas reais de captura.",
+  "profiles": {
+    "regular_only": {
+      "minimum_passage_width": "adequate",
+      "surface_tolerance": "regular_only",
+      "level_change_tolerance": "minor",
+      "accepts_partial_obstruction": true,
+      "requires_ramp_for_transition": null,
+      "slope_tolerance": null,
+      "accepts_detour": null
+    },
+    "minor_problems": {
+      "minimum_passage_width": "adequate",
+      "surface_tolerance": "minor_problems",
+      "level_change_tolerance": "minor",
+      "accepts_partial_obstruction": true,
+      "requires_ramp_for_transition": null,
+      "slope_tolerance": null,
+      "accepts_detour": null
+    }
+  },
+  "results": [
+    {
+      "scenario": "regular_only",
+      "image_path": "data\\annotation-pilot\\images\\curb_ramp\\gsv-amsterdam-18384-CurbRamp.png",
+      "features": {
+        "passage_width": "adequate",
+        "obstruction": "none",
+        "surface_condition": "minor_problem",
+        "level_change": "none",
+        "path_continuity": "continuous",
+        "obstacle_type": [],
+        "surface_obstacle": [
+          "uneven_slanted"
+        ]
+      },
+      "predictions": {
+        "passage_width": {
+          "prediction": "adequate",
+          "confidence": 0.8369140625,
+          "probabilities": {
+            "wide": 0.0295562744140625,
+            "adequate": 0.8369140625,
+            "narrow": 0.09326171875,
+            "very_narrow": 0.0362548828125,
+            "blocked": 0.003875732421875
+          }
+        },
+        "obstruction": {
+          "prediction": "none",
+          "confidence": 0.98291015625,
+          "probabilities": {
+            "none": 0.98291015625,
+            "partial": 0.0149383544921875,
+            "full": 0.0021572113037109375
+          }
+        },
+        "surface_condition": {
+          "prediction": "minor_problem",
+          "confidence": 0.7041015625,
+          "probabilities": {
+            "regular": 0.268798828125,
+            "minor_problem": 0.7041015625,
+            "major_problem": 0.0270843505859375
+          }
+        },
+        "level_change": {
+          "prediction": "none",
+          "confidence": 0.6728515625,
+          "probabilities": {
+            "none": 0.6728515625,
+            "minor": 0.09295654296875,
+            "step": 0.23388671875
+          }
+        },
+        "path_continuity": {
+          "prediction": "continuous",
+          "confidence": 0.962890625,
+          "probabilities": {
+            "continuous": 0.962890625,
+            "restricted": 0.0172882080078125,
+            "interrupted": 0.019775390625
+          }
+        },
+        "obstacle_type": {
+          "predictions": [],
+          "probabilities": {
+            "pole": 0.42919921875,
+            "sign": 0.1688232421875,
+            "tree": 0.25244140625,
+            "vegetation": 0.36474609375,
+            "construction": 0.06610107421875,
+            "litter_debris": 0.1458740234375,
+            "utility": 0.049041748046875
+          },
+          "thresholds": {
+            "pole": 0.5,
+            "sign": 0.5,
+            "tree": 0.5,
+            "vegetation": 0.5,
+            "construction": 0.5,
+            "litter_debris": 0.5,
+            "utility": 0.5
+          }
+        },
+        "surface_obstacle": {
+          "predictions": [
+            "uneven_slanted"
+          ],
+          "probabilities": {
+            "cracks": 0.3955078125,
+            "bumpy": 0.262451171875,
+            "uneven_slanted": 0.58544921875,
+            "height_difference": 0.10107421875,
+            "very_broken": 0.173583984375,
+            "grass": 0.154541015625,
+            "sand_gravel": 0.202880859375
+          },
+          "thresholds": {
+            "cracks": 0.5,
+            "bumpy": 0.5,
+            "uneven_slanted": 0.5,
+            "height_difference": 0.5,
+            "very_broken": 0.5,
+            "grass": 0.5,
+            "sand_gravel": 0.5
+          }
+        }
+      },
+      "not_modeled": {
+        "obstacle_type": {
+          "vehicle": {
+            "positive_train": 4,
+            "reason": "insufficient_support"
+          },
+          "bike_scooter": {
+            "positive_train": 5,
+            "reason": "insufficient_support"
+          },
+          "trash_container": {
+            "positive_train": 4,
+            "reason": "insufficient_support"
+          },
+          "stairs": {
+            "positive_train": 7,
+            "reason": "insufficient_support"
+          },
+          "street_furniture": {
+            "positive_train": 3,
+            "reason": "insufficient_support"
+          },
+          "other": {
+            "positive_train": 4,
+            "reason": "insufficient_support"
+          }
+        },
+        "surface_obstacle": {
+          "brick_cobblestone": {
+            "positive_train": 4,
+            "reason": "insufficient_support"
+          },
+          "pooled_water": {
+            "positive_train": 1,
+            "reason": "insufficient_support"
+          },
+          "rail_track": {
+            "positive_train": 1,
+            "reason": "insufficient_support"
+          },
+          "utility_panel": {
+            "positive_train": 0,
+            "reason": "insufficient_support"
+          },
+          "debris": {
+            "positive_train": 1,
+            "reason": "insufficient_support"
+          },
+          "other": {
+            "positive_train": 1,
+            "reason": "insufficient_support"
+          }
+        }
+      },
+      "inactive_features": [
+        "slope",
+        "ramp_condition",
+        "curb_access",
+        "detour"
+      ],
+      "observation": {
+        "source": "demo_simulated_timestamp_on_recorded_predictions",
+        "observed_at": "2026-11-26T10:00:00+00:00",
+        "evaluated_at": "2026-11-26T11:00:00+00:00",
+        "validity_seconds": 86400.0,
+        "expires_at": "2026-11-27T10:00:00+00:00",
+        "is_valid": true,
+        "code": "observation_valid",
+        "message": "Observação dentro do prazo de validade."
+      },
+      "profile": {
+        "minimum_passage_width": "adequate",
+        "surface_tolerance": "regular_only",
+        "level_change_tolerance": "minor",
+        "accepts_partial_obstruction": true,
+        "requires_ramp_for_transition": null,
+        "slope_tolerance": null,
+        "accepts_detour": null
+      },
+      "classification": "non_transitable",
+      "severity": "critical",
+      "reasons": [
+        {
+          "feature": "surface_condition",
+          "observed": "minor_problem",
+          "requirement": "regular_only",
+          "impact": "critical",
+          "code": "surface_condition_incompatible",
+          "message": "As irregularidades do piso: condição incompatível com o perfil. Características observadas: piso desnivelado.",
+          "evaluated": true
+        }
+      ],
+      "rule_results": [
+        {
+          "feature": "passage_width",
+          "observed": "adequate",
+          "requirement": "adequate",
+          "impact": "none",
+          "code": "passage_width_compatible",
+          "message": "Condição compatível com o perfil.",
+          "evaluated": true
+        },
+        {
+          "feature": "obstruction",
+          "observed": "none",
+          "requirement": true,
+          "impact": "none",
+          "code": "obstruction_compatible",
+          "message": "Condição compatível com o perfil.",
+          "evaluated": true
+        },
+        {
+          "feature": "surface_condition",
+          "observed": "minor_problem",
+          "requirement": "regular_only",
+          "impact": "critical",
+          "code": "surface_condition_incompatible",
+          "message": "As irregularidades do piso: condição incompatível com o perfil.",
+          "evaluated": true
+        },
+        {
+          "feature": "level_change",
+          "observed": "none",
+          "requirement": "minor",
+          "impact": "none",
+          "code": "level_change_compatible",
+          "message": "Condição compatível com o perfil.",
+          "evaluated": true
+        },
+        {
+          "feature": "path_continuity",
+          "observed": "continuous",
+          "requirement": "continuous",
+          "impact": "none",
+          "code": "path_continuity_compatible",
+          "message": "Condição compatível com o perfil.",
+          "evaluated": true
+        }
+      ],
+      "requires_review": false,
+      "unassessed_features": []
+    },
+    {
+      "scenario": "minor_problems",
+      "image_path": "data\\annotation-pilot\\images\\curb_ramp\\gsv-amsterdam-18384-CurbRamp.png",
+      "features": {
+        "passage_width": "adequate",
+        "obstruction": "none",
+        "surface_condition": "minor_problem",
+        "level_change": "none",
+        "path_continuity": "continuous",
+        "obstacle_type": [],
+        "surface_obstacle": [
+          "uneven_slanted"
+        ]
+      },
+      "predictions": {
+        "passage_width": {
+          "prediction": "adequate",
+          "confidence": 0.8369140625,
+          "probabilities": {
+            "wide": 0.0295562744140625,
+            "adequate": 0.8369140625,
+            "narrow": 0.09326171875,
+            "very_narrow": 0.0362548828125,
+            "blocked": 0.003875732421875
+          }
+        },
+        "obstruction": {
+          "prediction": "none",
+          "confidence": 0.98291015625,
+          "probabilities": {
+            "none": 0.98291015625,
+            "partial": 0.0149383544921875,
+            "full": 0.0021572113037109375
+          }
+        },
+        "surface_condition": {
+          "prediction": "minor_problem",
+          "confidence": 0.7041015625,
+          "probabilities": {
+            "regular": 0.268798828125,
+            "minor_problem": 0.7041015625,
+            "major_problem": 0.0270843505859375
+          }
+        },
+        "level_change": {
+          "prediction": "none",
+          "confidence": 0.6728515625,
+          "probabilities": {
+            "none": 0.6728515625,
+            "minor": 0.09295654296875,
+            "step": 0.23388671875
+          }
+        },
+        "path_continuity": {
+          "prediction": "continuous",
+          "confidence": 0.962890625,
+          "probabilities": {
+            "continuous": 0.962890625,
+            "restricted": 0.0172882080078125,
+            "interrupted": 0.019775390625
+          }
+        },
+        "obstacle_type": {
+          "predictions": [],
+          "probabilities": {
+            "pole": 0.42919921875,
+            "sign": 0.1688232421875,
+            "tree": 0.25244140625,
+            "vegetation": 0.36474609375,
+            "construction": 0.06610107421875,
+            "litter_debris": 0.1458740234375,
+            "utility": 0.049041748046875
+          },
+          "thresholds": {
+            "pole": 0.5,
+            "sign": 0.5,
+            "tree": 0.5,
+            "vegetation": 0.5,
+            "construction": 0.5,
+            "litter_debris": 0.5,
+            "utility": 0.5
+          }
+        },
+        "surface_obstacle": {
+          "predictions": [
+            "uneven_slanted"
+          ],
+          "probabilities": {
+            "cracks": 0.3955078125,
+            "bumpy": 0.262451171875,
+            "uneven_slanted": 0.58544921875,
+            "height_difference": 0.10107421875,
+            "very_broken": 0.173583984375,
+            "grass": 0.154541015625,
+            "sand_gravel": 0.202880859375
+          },
+          "thresholds": {
+            "cracks": 0.5,
+            "bumpy": 0.5,
+            "uneven_slanted": 0.5,
+            "height_difference": 0.5,
+            "very_broken": 0.5,
+            "grass": 0.5,
+            "sand_gravel": 0.5
+          }
+        }
+      },
+      "not_modeled": {
+        "obstacle_type": {
+          "vehicle": {
+            "positive_train": 4,
+            "reason": "insufficient_support"
+          },
+          "bike_scooter": {
+            "positive_train": 5,
+            "reason": "insufficient_support"
+          },
+          "trash_container": {
+            "positive_train": 4,
+            "reason": "insufficient_support"
+          },
+          "stairs": {
+            "positive_train": 7,
+            "reason": "insufficient_support"
+          },
+          "street_furniture": {
+            "positive_train": 3,
+            "reason": "insufficient_support"
+          },
+          "other": {
+            "positive_train": 4,
+            "reason": "insufficient_support"
+          }
+        },
+        "surface_obstacle": {
+          "brick_cobblestone": {
+            "positive_train": 4,
+            "reason": "insufficient_support"
+          },
+          "pooled_water": {
+            "positive_train": 1,
+            "reason": "insufficient_support"
+          },
+          "rail_track": {
+            "positive_train": 1,
+            "reason": "insufficient_support"
+          },
+          "utility_panel": {
+            "positive_train": 0,
+            "reason": "insufficient_support"
+          },
+          "debris": {
+            "positive_train": 1,
+            "reason": "insufficient_support"
+          },
+          "other": {
+            "positive_train": 1,
+            "reason": "insufficient_support"
+          }
+        }
+      },
+      "inactive_features": [
+        "slope",
+        "ramp_condition",
+        "curb_access",
+        "detour"
+      ],
+      "observation": {
+        "source": "demo_simulated_timestamp_on_recorded_predictions",
+        "observed_at": "2026-11-26T10:00:00+00:00",
+        "evaluated_at": "2026-11-26T11:00:00+00:00",
+        "validity_seconds": 86400.0,
+        "expires_at": "2026-11-27T10:00:00+00:00",
+        "is_valid": true,
+        "code": "observation_valid",
+        "message": "Observação dentro do prazo de validade."
+      },
+      "profile": {
+        "minimum_passage_width": "adequate",
+        "surface_tolerance": "minor_problems",
+        "level_change_tolerance": "minor",
+        "accepts_partial_obstruction": true,
+        "requires_ramp_for_transition": null,
+        "slope_tolerance": null,
+        "accepts_detour": null
+      },
+      "classification": "partially_transitable",
+      "severity": "moderate",
+      "reasons": [
+        {
+          "feature": "surface_condition",
+          "observed": "minor_problem",
+          "requirement": "minor_problems",
+          "impact": "moderate",
+          "code": "surface_condition_tolerated",
+          "message": "As irregularidades do piso: condição tolerada, com dificuldade moderada. Características observadas: piso desnivelado.",
+          "evaluated": true
+        }
+      ],
+      "rule_results": [
+        {
+          "feature": "passage_width",
+          "observed": "adequate",
+          "requirement": "adequate",
+          "impact": "none",
+          "code": "passage_width_compatible",
+          "message": "Condição compatível com o perfil.",
+          "evaluated": true
+        },
+        {
+          "feature": "obstruction",
+          "observed": "none",
+          "requirement": true,
+          "impact": "none",
+          "code": "obstruction_compatible",
+          "message": "Condição compatível com o perfil.",
+          "evaluated": true
+        },
+        {
+          "feature": "surface_condition",
+          "observed": "minor_problem",
+          "requirement": "minor_problems",
+          "impact": "moderate",
+          "code": "surface_condition_tolerated",
+          "message": "As irregularidades do piso: condição tolerada, com dificuldade moderada.",
+          "evaluated": true
+        },
+        {
+          "feature": "level_change",
+          "observed": "none",
+          "requirement": "minor",
+          "impact": "none",
+          "code": "level_change_compatible",
+          "message": "Condição compatível com o perfil.",
+          "evaluated": true
+        },
+        {
+          "feature": "path_continuity",
+          "observed": "continuous",
+          "requirement": "continuous",
+          "impact": "none",
+          "code": "path_continuity_compatible",
+          "message": "Condição compatível com o perfil.",
+          "evaluated": true
+        }
+      ],
+      "requires_review": false,
+      "unassessed_features": []
+    },
+    {
+      "scenario": "regular_only",
+      "image_path": "data\\annotation-pilot\\images\\curb_ramp\\gsv-amsterdam-18384-CurbRamp.png",
+      "features": {
+        "passage_width": "adequate",
+        "obstruction": "none",
+        "surface_condition": "minor_problem",
+        "level_change": "none",
+        "path_continuity": "continuous",
+        "obstacle_type": [],
+        "surface_obstacle": [
+          "uneven_slanted"
+        ]
+      },
+      "predictions": {
+        "passage_width": {
+          "prediction": "adequate",
+          "confidence": 0.8369140625,
+          "probabilities": {
+            "wide": 0.0295562744140625,
+            "adequate": 0.8369140625,
+            "narrow": 0.09326171875,
+            "very_narrow": 0.0362548828125,
+            "blocked": 0.003875732421875
+          }
+        },
+        "obstruction": {
+          "prediction": "none",
+          "confidence": 0.98291015625,
+          "probabilities": {
+            "none": 0.98291015625,
+            "partial": 0.0149383544921875,
+            "full": 0.0021572113037109375
+          }
+        },
+        "surface_condition": {
+          "prediction": "minor_problem",
+          "confidence": 0.7041015625,
+          "probabilities": {
+            "regular": 0.268798828125,
+            "minor_problem": 0.7041015625,
+            "major_problem": 0.0270843505859375
+          }
+        },
+        "level_change": {
+          "prediction": "none",
+          "confidence": 0.6728515625,
+          "probabilities": {
+            "none": 0.6728515625,
+            "minor": 0.09295654296875,
+            "step": 0.23388671875
+          }
+        },
+        "path_continuity": {
+          "prediction": "continuous",
+          "confidence": 0.962890625,
+          "probabilities": {
+            "continuous": 0.962890625,
+            "restricted": 0.0172882080078125,
+            "interrupted": 0.019775390625
+          }
+        },
+        "obstacle_type": {
+          "predictions": [],
+          "probabilities": {
+            "pole": 0.42919921875,
+            "sign": 0.1688232421875,
+            "tree": 0.25244140625,
+            "vegetation": 0.36474609375,
+            "construction": 0.06610107421875,
+            "litter_debris": 0.1458740234375,
+            "utility": 0.049041748046875
+          },
+          "thresholds": {
+            "pole": 0.5,
+            "sign": 0.5,
+            "tree": 0.5,
+            "vegetation": 0.5,
+            "construction": 0.5,
+            "litter_debris": 0.5,
+            "utility": 0.5
+          }
+        },
+        "surface_obstacle": {
+          "predictions": [
+            "uneven_slanted"
+          ],
+          "probabilities": {
+            "cracks": 0.3955078125,
+            "bumpy": 0.262451171875,
+            "uneven_slanted": 0.58544921875,
+            "height_difference": 0.10107421875,
+            "very_broken": 0.173583984375,
+            "grass": 0.154541015625,
+            "sand_gravel": 0.202880859375
+          },
+          "thresholds": {
+            "cracks": 0.5,
+            "bumpy": 0.5,
+            "uneven_slanted": 0.5,
+            "height_difference": 0.5,
+            "very_broken": 0.5,
+            "grass": 0.5,
+            "sand_gravel": 0.5
+          }
+        }
+      },
+      "not_modeled": {
+        "obstacle_type": {
+          "vehicle": {
+            "positive_train": 4,
+            "reason": "insufficient_support"
+          },
+          "bike_scooter": {
+            "positive_train": 5,
+            "reason": "insufficient_support"
+          },
+          "trash_container": {
+            "positive_train": 4,
+            "reason": "insufficient_support"
+          },
+          "stairs": {
+            "positive_train": 7,
+            "reason": "insufficient_support"
+          },
+          "street_furniture": {
+            "positive_train": 3,
+            "reason": "insufficient_support"
+          },
+          "other": {
+            "positive_train": 4,
+            "reason": "insufficient_support"
+          }
+        },
+        "surface_obstacle": {
+          "brick_cobblestone": {
+            "positive_train": 4,
+            "reason": "insufficient_support"
+          },
+          "pooled_water": {
+            "positive_train": 1,
+            "reason": "insufficient_support"
+          },
+          "rail_track": {
+            "positive_train": 1,
+            "reason": "insufficient_support"
+          },
+          "utility_panel": {
+            "positive_train": 0,
+            "reason": "insufficient_support"
+          },
+          "debris": {
+            "positive_train": 1,
+            "reason": "insufficient_support"
+          },
+          "other": {
+            "positive_train": 1,
+            "reason": "insufficient_support"
+          }
+        }
+      },
+      "inactive_features": [
+        "slope",
+        "ramp_condition",
+        "curb_access",
+        "detour"
+      ],
+      "observation": {
+        "source": "demo_simulated_timestamp_on_recorded_predictions",
+        "observed_at": "2026-11-26T10:00:00+00:00",
+        "evaluated_at": "2026-11-27T11:00:00+00:00",
+        "validity_seconds": 86400.0,
+        "expires_at": "2026-11-27T10:00:00+00:00",
+        "is_valid": false,
+        "code": "observation_expired",
+        "message": "As informações do trecho estão desatualizadas: observação vencida."
+      },
+      "profile": {
+        "minimum_passage_width": "adequate",
+        "surface_tolerance": "regular_only",
+        "level_change_tolerance": "minor",
+        "accepts_partial_obstruction": true,
+        "requires_ramp_for_transition": null,
+        "slope_tolerance": null,
+        "accepts_detour": null
+      },
+      "classification": "undetermined",
+      "severity": "none",
+      "reasons": [
+        {
+          "feature": "observation",
+          "observed": "2026-11-26T10:00:00+00:00",
+          "requirement": "valid_observation",
+          "impact": "none",
+          "code": "observation_expired",
+          "message": "As informações do trecho estão desatualizadas: observação vencida.",
+          "evaluated": false
+        }
+      ],
+      "rule_results": [],
+      "requires_review": true,
+      "unassessed_features": [
+        "passage_width",
+        "obstruction",
+        "surface_condition",
+        "level_change",
+        "path_continuity"
+      ]
+    },
+    {
+      "scenario": "minor_problems",
+      "image_path": "data\\annotation-pilot\\images\\curb_ramp\\gsv-amsterdam-18384-CurbRamp.png",
+      "features": {
+        "passage_width": "adequate",
+        "obstruction": "none",
+        "surface_condition": "minor_problem",
+        "level_change": "none",
+        "path_continuity": "continuous",
+        "obstacle_type": [],
+        "surface_obstacle": [
+          "uneven_slanted"
+        ]
+      },
+      "predictions": {
+        "passage_width": {
+          "prediction": "adequate",
+          "confidence": 0.8369140625,
+          "probabilities": {
+            "wide": 0.0295562744140625,
+            "adequate": 0.8369140625,
+            "narrow": 0.09326171875,
+            "very_narrow": 0.0362548828125,
+            "blocked": 0.003875732421875
+          }
+        },
+        "obstruction": {
+          "prediction": "none",
+          "confidence": 0.98291015625,
+          "probabilities": {
+            "none": 0.98291015625,
+            "partial": 0.0149383544921875,
+            "full": 0.0021572113037109375
+          }
+        },
+        "surface_condition": {
+          "prediction": "minor_problem",
+          "confidence": 0.7041015625,
+          "probabilities": {
+            "regular": 0.268798828125,
+            "minor_problem": 0.7041015625,
+            "major_problem": 0.0270843505859375
+          }
+        },
+        "level_change": {
+          "prediction": "none",
+          "confidence": 0.6728515625,
+          "probabilities": {
+            "none": 0.6728515625,
+            "minor": 0.09295654296875,
+            "step": 0.23388671875
+          }
+        },
+        "path_continuity": {
+          "prediction": "continuous",
+          "confidence": 0.962890625,
+          "probabilities": {
+            "continuous": 0.962890625,
+            "restricted": 0.0172882080078125,
+            "interrupted": 0.019775390625
+          }
+        },
+        "obstacle_type": {
+          "predictions": [],
+          "probabilities": {
+            "pole": 0.42919921875,
+            "sign": 0.1688232421875,
+            "tree": 0.25244140625,
+            "vegetation": 0.36474609375,
+            "construction": 0.06610107421875,
+            "litter_debris": 0.1458740234375,
+            "utility": 0.049041748046875
+          },
+          "thresholds": {
+            "pole": 0.5,
+            "sign": 0.5,
+            "tree": 0.5,
+            "vegetation": 0.5,
+            "construction": 0.5,
+            "litter_debris": 0.5,
+            "utility": 0.5
+          }
+        },
+        "surface_obstacle": {
+          "predictions": [
+            "uneven_slanted"
+          ],
+          "probabilities": {
+            "cracks": 0.3955078125,
+            "bumpy": 0.262451171875,
+            "uneven_slanted": 0.58544921875,
+            "height_difference": 0.10107421875,
+            "very_broken": 0.173583984375,
+            "grass": 0.154541015625,
+            "sand_gravel": 0.202880859375
+          },
+          "thresholds": {
+            "cracks": 0.5,
+            "bumpy": 0.5,
+            "uneven_slanted": 0.5,
+            "height_difference": 0.5,
+            "very_broken": 0.5,
+            "grass": 0.5,
+            "sand_gravel": 0.5
+          }
+        }
+      },
+      "not_modeled": {
+        "obstacle_type": {
+          "vehicle": {
+            "positive_train": 4,
+            "reason": "insufficient_support"
+          },
+          "bike_scooter": {
+            "positive_train": 5,
+            "reason": "insufficient_support"
+          },
+          "trash_container": {
+            "positive_train": 4,
+            "reason": "insufficient_support"
+          },
+          "stairs": {
+            "positive_train": 7,
+            "reason": "insufficient_support"
+          },
+          "street_furniture": {
+            "positive_train": 3,
+            "reason": "insufficient_support"
+          },
+          "other": {
+            "positive_train": 4,
+            "reason": "insufficient_support"
+          }
+        },
+        "surface_obstacle": {
+          "brick_cobblestone": {
+            "positive_train": 4,
+            "reason": "insufficient_support"
+          },
+          "pooled_water": {
+            "positive_train": 1,
+            "reason": "insufficient_support"
+          },
+          "rail_track": {
+            "positive_train": 1,
+            "reason": "insufficient_support"
+          },
+          "utility_panel": {
+            "positive_train": 0,
+            "reason": "insufficient_support"
+          },
+          "debris": {
+            "positive_train": 1,
+            "reason": "insufficient_support"
+          },
+          "other": {
+            "positive_train": 1,
+            "reason": "insufficient_support"
+          }
+        }
+      },
+      "inactive_features": [
+        "slope",
+        "ramp_condition",
+        "curb_access",
+        "detour"
+      ],
+      "observation": {
+        "source": "demo_simulated_timestamp_on_recorded_predictions",
+        "observed_at": "2026-11-26T10:00:00+00:00",
+        "evaluated_at": "2026-11-27T11:00:00+00:00",
+        "validity_seconds": 86400.0,
+        "expires_at": "2026-11-27T10:00:00+00:00",
+        "is_valid": false,
+        "code": "observation_expired",
+        "message": "As informações do trecho estão desatualizadas: observação vencida."
+      },
+      "profile": {
+        "minimum_passage_width": "adequate",
+        "surface_tolerance": "minor_problems",
+        "level_change_tolerance": "minor",
+        "accepts_partial_obstruction": true,
+        "requires_ramp_for_transition": null,
+        "slope_tolerance": null,
+        "accepts_detour": null
+      },
+      "classification": "undetermined",
+      "severity": "none",
+      "reasons": [
+        {
+          "feature": "observation",
+          "observed": "2026-11-26T10:00:00+00:00",
+          "requirement": "valid_observation",
+          "impact": "none",
+          "code": "observation_expired",
+          "message": "As informações do trecho estão desatualizadas: observação vencida.",
+          "evaluated": false
+        }
+      ],
+      "rule_results": [],
+      "requires_review": true,
+      "unassessed_features": [
+        "passage_width",
+        "obstruction",
+        "surface_condition",
+        "level_change",
+        "path_continuity"
+      ]
+    }
+  ]
+}

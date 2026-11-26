@@ -1,0 +1,23 @@
+{
+  "model_name": "nvidia/segformer-b0-finetuned-cityscapes-1024-1024",
+  "initialized_from": "nvidia/segformer-b0-finetuned-cityscapes-1024-1024",
+  "image_size": 512,
+  "loss": "Cross Entropy + Dice",
+  "optimizer": "AdamW",
+  "learning_rate": 6e-05,
+  "weight_decay": 0.01,
+  "batch_size": 4,
+  "amp": true,
+  "max_epochs": 30,
+  "patience": 5,
+  "seed": 42,
+  "selection": "validation foreground IoU; tie: validation loss",
+  "split_source": "artifacts\\dinov2\\v1\\splits.csv",
+  "split_sha256": "c31739597483c7e6c960c35a59a3dd318a7b7c11e7f71802efcab8be70f2be52",
+  "split_sizes": {
+    "train": 134,
+    "validation": 29,
+    "test": 29
+  },
+  "limitation": "O teste é comum aos dois modelos, mas não é um holdout final completamente cego: seus resultados já foram observados durante o desenvolvimento."
+}

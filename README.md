@@ -1,117 +1,389 @@
-# Transitabilidade Urbana com Visão Computacional
+# Urban Transitability with Computer Vision
 
-Projeto proposto para a disciplina **Projeto Transformador I**, do curso de Ciência da Computação da PUCPR.
+[![Python](https://img.shields.io/badge/Python-%3E%3D3.10-3776AB?logo=python&logoColor=white)](pyproject.toml)
+[![Tests](https://img.shields.io/badge/tests-83%20passing-brightgreen)](tests)
+![Project status](https://img.shields.io/badge/status-experimental-orange)
+![License](https://img.shields.io/badge/license-not%20yet%20defined-lightgrey)
 
-A proposta é desenvolver uma solução de apoio à mobilidade urbana capaz de avaliar se um trecho é realmente transitável para pessoas com diferentes perfis de mobilidade. A existência de uma calçada, rampa ou rota disponível não significa, por si só, que o deslocamento seja viável.
+A computer-vision project for extracting accessibility-related information from
+street-level imagery. The repository provides a local annotation tool,
+reproducible dataset checks, a SegFormer circulation-path segmenter, and an
+experimental DINOv2 multi-task classifier.
 
-Obstáculos, buracos, degraus, desníveis, trechos estreitos, obras, veículos e outras condições podem dificultar ou impedir a passagem. O projeto busca transformar essas características do ambiente em informação útil para planejamento de deslocamentos.
+The software is intended for research and prototyping. Predictions can be wrong
+and must not be treated as a definitive accessibility assessment or as a
+substitute for an on-site evaluation.
 
-## Proposta
+## Overview
 
-O sistema utilizará imagens de trechos urbanos para identificar características relevantes para a mobilidade e, a partir delas, avaliar a transitabilidade do local.
+The current pipeline separates two visual questions:
 
-Inicialmente, o foco será em usuários de cadeira de rodas. A partir da análise de uma imagem, o sistema deverá considerar características como obstáculos, degraus, buracos e problemas de superfície, desníveis, rampas e limitações de largura ou passagem para classificar o trecho como:
+1. **Where is the circulation path?** SegFormer predicts the image region where
+   pedestrian circulation is expected.
+2. **What are the visible conditions of that region?** DINOv2 predicts properties
+   such as passage width, obstruction, surface condition, level change, route
+   continuity, obstacle types, and surface problems.
 
-- **Transitável**
-- **Parcialmente transitável**
-- **Não transitável**
+The repository also retains the earlier **MVP0** pipeline. That experiment uses
+a ResNet18 to detect seven obstacle labels and a fixed heuristic to produce
+one of three Portuguese transitability classes:
 
-O objetivo não é apenas reconhecer elementos isolados, mas utilizar as características detectadas para estimar a possibilidade real de passagem.
+- **Transitável** — only low-impact features, or no detected feature;
+- **Parcialmente transitável** — at least one moderate-impact feature;
+- **Não transitável** — at least one high-impact feature.
 
-Essas avaliações poderão ser associadas ao mapa da cidade e utilizadas posteriormente na construção e comparação de rotas. Com uma quantidade suficiente de trechos avaliados, o sistema poderá considerar não apenas distância ou tempo, mas também as condições reais dos caminhos disponíveis.
+This three-level decision rule is implemented only for the legacy MVP0. A
+profile-aware decision layer for the SegFormer + DINOv2 pipeline is not yet
+implemented.
 
-A proposta também considera que diferentes perfis de mobilidade possuem necessidades diferentes. Um mesmo trecho pode ser adequado para uma pessoa e apresentar dificuldades para outra. Por isso, após a validação inicial com usuários de cadeira de rodas, o sistema poderá evoluir para aplicar critérios específicos a outros perfis de mobilidade.
+```mermaid
+flowchart LR
+    A[Street-level image] --> B[SegFormer-B0]
+    B --> C[Circulation-path mask]
+    C --> D[DINOv2 Base]
+    A --> D
+    D --> E[Visual transitability features]
+    E -. planned .-> F[Profile-aware decision layer]
+```
 
-Em uma evolução futura, a plataforma também poderá integrar serviços de mobilidade assistiva, como pontos de retirada ou aluguel de cadeiras de rodas elétricas. A ideia seria permitir que uma rota combinasse diferentes formas de deslocamento, de maneira semelhante a aplicativos de mobilidade que integram transporte público, caminhada e serviços sob demanda.
+## Visual Demo
 
-Nesse cenário, a classificação das condições das calçadas continua sendo a base do sistema, porque ela permite determinar onde cada trecho é efetivamente transitável e quais alternativas podem ser consideradas durante o percurso.
+The annotation interface stores normalized circulation-path polygons together
+with structured accessibility properties. A SegFormer suggestion can be loaded
+into the editor, reviewed, corrected, and saved by the annotator.
 
-## Mapeamento e atualização dos dados
+<img src="docs/assets/annotation-tool.png" alt="Streamlit annotation tool with an editable circulation-path polygon and structured transitability fields" width="100%">
 
-As avaliações poderão ser associadas a localizações geográficas, permitindo construir gradualmente um mapa das condições de transitabilidade dos trechos urbanos.
+The comparison below uses a real frozen test sample. It shows the original
+image, human ground truth, SegFormer v1, and SegFormer v2.
 
-Usuários poderão contribuir com novas imagens de locais já cadastrados ou ainda não avaliados. O sistema poderá processar essas imagens e atualizar as informações conforme as condições do ambiente mudem ao longo do tempo.
+<img src="docs/assets/segformer-v1-v2-comparison.jpg" alt="Original image, circulation-path ground truth, SegFormer v1 prediction, and SegFormer v2 prediction" width="100%">
 
-Esse modelo permite ampliar progressivamente a cobertura do mapa sem depender exclusivamente de uma coleta centralizada. Também possibilita manter um histórico das condições dos trechos e identificar mudanças relevantes no ambiente urbano.
+The DINOv2 baseline currently exposes structured JSON predictions through its
+CLI. Its evaluated results are reported below; no synthetic classification
+visualization is used in this README.
 
-As informações geradas podem ser utilizadas tanto pelos próprios usuários quanto por órgãos de gestão urbana, por exemplo para identificar regiões com maior concentração de barreiras ou acompanhar pontos que apresentem problemas recorrentes de acessibilidade.
+## Features
 
-## Validação e evolução
+- **Generic local annotation tool** built with Streamlit. It accepts any image
+  directory and does not assume that every Project Sidewalk subset is present.
+- **Versioned annotation schema** with single-label, multi-label, spatial, and
+  confidence fields.
+- **Editable circulation-path polygons** stored as normalized coordinates.
+- **Optional SegFormer assistance** that never persists a prediction without an
+  explicit human save.
+- **Atomic CSV persistence**, schema validation, duplicate detection, filtering,
+  and export.
+- **SegFormer-B0 training and inference** for binary circulation-path
+  segmentation.
+- **DINOv2 Base multi-task baseline** with a frozen backbone and independent
+  categorical and multi-label heads.
+- **Panorama-aware deterministic splits** to prevent related images from
+  crossing train, validation, and test sets.
+- **Dataset QA, metrics, prediction exports, and error-analysis artifacts**.
+- **Legacy MVP0 inference** with ResNet18, per-label thresholds, a three-level
+  heuristic, and a generated justification.
 
-A proposta será validada comparando as classificações produzidas pelo sistema com avaliações de referência dos mesmos trechos.
+## How It Works
 
-O desempenho poderá ser analisado utilizando métricas como:
+### Annotation and dataset
 
-- acurácia;
-- precisão;
-- recall;
-- F1-score;
-- matriz de confusão.
+The pilot contains 200 annotated Project Sidewalk images:
 
-Os componentes de visão computacional também poderão ser avaliados individualmente de acordo com as métricas adequadas para cada tarefa.
+- 192 records have an annotated `circulation_path`;
+- 8 records are marked `unknown` and are excluded from segmentation and
+  DINOv2 training;
+- all records use annotation schema version 3.
 
-Após a validação do MVP, algumas evoluções possíveis incluem:
+The schema defines 12 human-reviewed properties. Eleven are potential model
+outputs; `annotation_confidence` is metadata only. The first DINOv2 baseline
+models seven property groups:
 
-- geração de rotas considerando a transitabilidade dos trechos;
-- personalização das rotas para diferentes perfis de mobilidade;
-- integração com transporte público e outros serviços de mobilidade;
-- integração com pontos de aluguel ou compartilhamento de cadeiras de rodas elétricas;
-- uso do histórico para identificar mudanças nas condições das calçadas;
-- geração de informações agregadas para apoio à gestão urbana.
+- `passage_width`
+- `obstruction`
+- `surface_condition`
+- `level_change`
+- `path_continuity`
+- `obstacle_type`
+- `surface_obstacle`
 
-## Estado atual
+The remaining schema properties are annotated but are not outputs of the current
+DINOv2 baseline.
 
-O projeto está em fase de definição e validação inicial. O foco atual está na delimitação do MVP, seleção das barreiras consideradas, definição dos critérios de transitabilidade, escolha dos datasets e estudo das abordagens de visão computacional que poderão ser utilizadas.
+### Segmentation
 
-## Ferramenta local de anotação
+SegFormer-B0 is initialized from
+`nvidia/segformer-b0-finetuned-cityscapes-1024-1024` and fine-tuned as a
+two-class segmenter:
 
-A infraestrutura de anotação do protótipo final fica em
-`tools/annotation_app/`. Ela carrega as labels de
-`annotations/annotation-schema.yaml` e funciona com qualquer diretório local de
-imagens, mesmo quando somente o subset `Obstacle` está disponível.
+- `0`: background;
+- `1`: circulation path.
 
-Após instalar o projeto com `python -m pip install -e .`, execute:
+The model is selected exclusively by foreground IoU on validation data. The
+frozen test set is evaluated only after checkpoint selection.
+
+### Feature classification
+
+The DINOv2 baseline uses `facebook/dinov2-base` with:
+
+- a frozen ViT-B/14 backbone;
+- the 768-dimensional CLS token;
+- one head per annotated property group;
+- class weights computed from the training split;
+- validation-selected thresholds for multi-label heads.
+
+The circulation region remains unchanged while the surrounding context is
+darkened, desaturated, and blurred before classification.
+
+## Quick Start
+
+### Requirements
+
+- Python 3.10 or newer;
+- the dependencies declared in [`pyproject.toml`](pyproject.toml);
+- local dataset images for annotation, training, or inference;
+- local checkpoints for inference.
+
+CUDA is optional for the annotation tool and inference, which fall back to CPU.
+The current SegFormer and DINOv2 training scripts require CUDA.
+
+Raw images, generated image processors, and model checkpoints are intentionally
+ignored by Git. Reports and split definitions are versioned, but a fresh clone
+does not include trained weights.
+
+### Install
+
+From the repository root:
+
+```bash
+python -m venv .venv
+python -m pip install --upgrade pip
+python -m pip install -e .
+```
+
+Activate the virtual environment using the command appropriate for your shell
+before installing or running the project.
+
+### Run the annotation tool
 
 ```bash
 python -m streamlit run tools/annotation_app/app.py
 ```
 
-Instruções de uso, persistência e formato do CSV estão em
-`tools/annotation_app/README.md`. O manual de decisão das labels está em
-`annotations/annotation-guidelines.md`.
+The tool defaults to:
 
-## Segmentação da faixa de circulação
+- images: `data/obstacles/crops`;
+- annotations: `annotations/transitability_annotations.csv`.
 
-O primeiro componente do pipeline final segmenta `circulation_path` como uma
-máscara binária com SegFormer-B0 inicializado a partir de
-`nvidia/segformer-b0-finetuned-cityscapes-1024-1024`. Antes de qualquer treino,
-execute o QA estrutural e visual:
+Both paths can be changed in the interface. See the
+[annotation tool guide](tools/annotation_app/README.md) for the complete workflow.
+
+### Run dataset QA
 
 ```bash
 python -m ml.segmentation.qa
 ```
 
-O relatório fica em `artifacts/segmentation/dataset_qa.md` e os previews em
-`artifacts/segmentation/qa_overlays/`. O treino recusa automaticamente CSVs com
-status diferente de `annotated`, geometria inválida, imagem ausente ou dimensões
-incompatíveis:
+The default report is written to `artifacts/segmentation/dataset_qa.md`.
+
+### Run SegFormer inference
+
+```bash
+python -m ml.segmentation.predict \
+  --image path/to/image.png \
+  --checkpoint artifacts/segmentation/v2/best_segformer.pt \
+  --output-dir outputs/segmentation
+```
+
+This writes a binary mask and an overlay. To use the v1 checkpoint, omit the
+`--checkpoint` argument.
+
+### Run DINOv2 inference
+
+DINOv2 requires an image and either a binary mask or normalized polygon:
+
+```bash
+python -m ml.dinov2.predict \
+  --image path/to/image.png \
+  --mask outputs/segmentation/image_circulation_path_mask.png \
+  --checkpoint artifacts/dinov2/v1/best_dinov2_multitask.pt
+```
+
+The command prints categorical predictions, multi-label predictions,
+probabilities, and the validation-selected thresholds as JSON.
+
+### Run the legacy MVP0
+
+When `best_model.pt` is available at the repository root:
+
+```bash
+python -m ml.predict path/to/image.png
+```
+
+This is the only current command that produces the three-level transitability
+classification and Portuguese justification.
+
+### Run tests
+
+```bash
+python -m unittest discover -v
+```
+
+The current suite contains 83 tests covering annotation persistence, schema
+validation, dataset loading, split isolation, segmentation utilities, DINOv2
+heads and metrics, MVP0 inference, and transitability rules.
+
+## Training
+
+Training expects the local pilot images and annotation CSV described in the
+documentation.
+
+### SegFormer
 
 ```bash
 python -m ml.segmentation.train
+python -m ml.segmentation.train_v2
 ```
 
-O checkpoint v1 treinado fica em `artifacts/segmentation/best_segformer.pt`.
-A inferência em imagem arbitrária é executada com:
+The v2 run preserves the v1 validation and test sets and writes separate
+artifacts under `artifacts/segmentation/v2/`.
+
+### DINOv2
+
+Inspect and split the dataset without training:
 
 ```bash
-python -m ml.segmentation.predict --image caminho/para/imagem.png
+python -m ml.dinov2.train --prepare-only
 ```
 
-O split próprio é congelado em 75 imagens de treino, 15 de validação e 15 de
-teste com seed 42. Panoramas são mantidos em um único split, e o teste só é
-avaliado depois da escolha do checkpoint por foreground IoU na validação.
+Run the baseline training:
 
-O mesmo checkpoint está integrado ao annotation tool como assistente opcional.
-Em imagens pendentes, **Gerar sugestão SegFormer** preenche o editor de polygon;
-o anotador pode corrigir, restaurar ou limpar a previsão. Nada é persistido até
-o save humano, e anotações existentes nunca recebem inferência automaticamente.
+```bash
+python -m ml.dinov2.train
+```
+
+Training uses validation data for checkpoint selection and multi-label threshold
+selection. Test data is evaluated only after those choices are frozen.
+
+## Models and Evaluation
+
+### SegFormer
+
+Both versions use the same 15 validation and 15 test images. SegFormer v2 adds
+all newly annotated valid masks to the training set.
+
+| Model | Train / validation / test | Foreground IoU | Dice | Precision | Recall |
+|---|---:|---:|---:|---:|---:|
+| SegFormer v1 | 75 / 15 / 15 | 0.4517 | 0.6223 | 0.6125 | 0.6324 |
+| SegFormer v2 | 162 / 15 / 15 | **0.5572** | **0.7157** | **0.6460** | **0.8023** |
+
+The best v2 checkpoint was selected at epoch 14 with validation IoU 0.5845 and
+validation Dice 0.7378. The recorded history shows an overfitting signal after
+that epoch; early stopping prevented later epochs from replacing the checkpoint.
+
+See the full [v1/v2 comparison](artifacts/segmentation/v2/comparison_v1_v2.md).
+
+### DINOv2 baseline
+
+The evaluated split contains 134 training, 29 validation, and 29 test images.
+The test aggregate macro F1 is **0.2773**.
+
+| Head | Test macro F1 |
+|---|---:|
+| Surface condition | 0.4469 |
+| Path continuity | 0.3435 |
+| Passage width | 0.2632 |
+| Level change | 0.2500 |
+| Surface obstacles | 0.2281 |
+| Obstacle types | 0.2215 |
+| Obstruction | 0.1880 |
+
+This is an exploratory baseline, not a production model. The best validation
+result occurred at epoch 2, followed by overfitting. Several labels have only
+one or two positive examples, and some have none in the current pilot. Per-head
+metrics should therefore be interpreted together with class support.
+
+See the [dataset analysis](artifacts/dinov2/v1/dataset_analysis.md),
+[test metrics](artifacts/dinov2/v1/test_metrics.json), and
+[error analysis](artifacts/dinov2/v1/error_analysis.md).
+
+## Project Structure
+
+```text
+annotations/                 Schema, guidelines, and human annotations
+artifacts/                   Versioned reports, splits, metrics, and histories
+data/annotation-pilot/       Reproducible pilot metadata; images remain local
+docs/                        Design notes, progress reports, diagrams, and assets
+ml/data/                     Legacy obstacle dataset loading
+ml/segmentation/             SegFormer dataset, training, QA, and inference
+ml/dinov2/                   DINOv2 dataset, model, losses, metrics, and inference
+ml/*.py                      Legacy ResNet18 MVP0 pipeline
+scripts/                     Dataset inspection, pilot construction, and analysis
+tools/annotation_app/        Streamlit annotation application
+tests/                       Unit and integration-oriented tests
+```
+
+Generated checkpoints and visual outputs are excluded by
+[`.gitignore`](.gitignore). CSV, JSON, and Markdown experiment reports remain
+available for review.
+
+## Documentation
+
+- [Annotation tool guide](tools/annotation_app/README.md)
+- [Annotation guidelines](annotations/annotation-guidelines.md)
+- [Annotation schema](annotations/annotation-schema.yaml)
+- [Technical progress report](docs/progress/2026-10-30.md)
+- [SegFormer v1/v2 comparison](artifacts/segmentation/v2/comparison_v1_v2.md)
+- [DINOv2 dataset analysis](artifacts/dinov2/v1/dataset_analysis.md)
+- [DINOv2 error analysis](artifacts/dinov2/v1/error_analysis.md)
+- [Requirements document](docs/documento-requisitos.md)
+- [MVP modeling notes](docs/modelagem-mvp.md)
+- [References](docs/referencias.md)
+
+## Roadmap
+
+Current engineering priorities are:
+
+- improve DINOv2 generalization and evaluate alternatives to a fully frozen
+  backbone;
+- collect targeted examples for rare and unsupported labels;
+- determine which accessibility properties can be inferred reliably from a
+  single image;
+- implement and validate a profile-aware decision layer for the current
+  SegFormer + DINOv2 pipeline;
+- define a reproducible checkpoint distribution strategy.
+
+Collaborative maps, route planning, mobility profiles, APIs, and personalized
+navigation are not implemented in the current repository. They remain possible
+later-stage applications rather than current features.
+
+## Contributing
+
+Contributions should remain small, testable, and consistent with the current
+experiment boundaries.
+
+1. Create a focused branch.
+2. Preserve annotation schema compatibility and frozen evaluation splits unless
+   a change explicitly introduces a new experiment version.
+3. Add or update tests for behavioral changes.
+4. Run `python -m unittest discover -v`.
+5. Document any new command, artifact format, or data requirement.
+
+Do not commit raw datasets, generated checkpoints, or personally identifying
+street imagery outside the repository's established data policy.
+
+## License
+
+This repository does not currently include a license file. A license still needs
+to be selected by the maintainers; do not assume MIT, Apache, or another
+open-source license until that decision is recorded.
+
+## Origin and Acknowledgments
+
+The project originated in the *Projeto Transformador I* course in the Computer
+Science program at PUCPR and has evolved into an experimental urban-accessibility
+computer-vision codebase.
+
+The pilot data is derived from Project Sidewalk datasets. Model baselines use
+SegFormer and DINOv2 through the Hugging Face Transformers ecosystem, and the
+legacy MVP0 uses torchvision's ResNet18.

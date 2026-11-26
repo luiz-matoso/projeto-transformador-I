@@ -1,0 +1,54 @@
+{
+  "image_count": 29,
+  "assessment_count": 87,
+  "profiles": {
+    "wide_regular_no_steps": {
+      "minimum_passage_width": "wide",
+      "surface_tolerance": "regular_only",
+      "level_change_tolerance": "none",
+      "accepts_partial_obstruction": false,
+      "requires_ramp_for_transition": null,
+      "slope_tolerance": null,
+      "accepts_detour": null
+    },
+    "adequate_minor_partial": {
+      "minimum_passage_width": "adequate",
+      "surface_tolerance": "minor_problems",
+      "level_change_tolerance": "minor",
+      "accepts_partial_obstruction": true,
+      "requires_ramp_for_transition": null,
+      "slope_tolerance": null,
+      "accepts_detour": null
+    },
+    "narrow_major_steps": {
+      "minimum_passage_width": "narrow",
+      "surface_tolerance": "major_problems",
+      "level_change_tolerance": "step",
+      "accepts_partial_obstruction": true,
+      "requires_ramp_for_transition": null,
+      "slope_tolerance": null,
+      "accepts_detour": null
+    }
+  },
+  "classifications": {
+    "wide_regular_no_steps": {
+      "non_transitable": 29
+    },
+    "adequate_minor_partial": {
+      "partially_transitable": 8,
+      "transitable": 4,
+      "non_transitable": 17
+    },
+    "narrow_major_steps": {
+      "partially_transitable": 20,
+      "transitable": 6,
+      "non_transitable": 3
+    }
+  },
+  "checkpoint_hashes": {
+    "artifacts\\segmentation\\common-dino-split\\best_segformer.pt": "9066ebb7320e99d52796d68b57e46e4bcd4a8acd81843e9ce517b8aeb9dd85a6",
+    "artifacts\\dinov2\\v2\\partial\\best_dinov2_v2.pt": "addab391af034c777f4b77fc17d00d7d003c20815e3f979111fecb9029e8d4bb"
+  },
+  "purpose": "Execução e consistência; sem ground truth de transitabilidade personalizada e sem métrica de acurácia.",
+  "limitation": "Teste comum sem participação em treino/validação, mas observado anteriormente durante o desenvolvimento."
+}

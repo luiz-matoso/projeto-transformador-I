@@ -1,0 +1,61 @@
+{
+  "n": 29,
+  "mean_iou": 0.5327084133977695,
+  "mean_dice": 0.6670208389279784,
+  "correlations": {
+    "changed": {
+      "pearson_iou": -0.4415870259965071,
+      "spearman_iou": -0.34414259522346735
+    },
+    "correct_to_wrong": {
+      "pearson_iou": -0.2885386764911566,
+      "spearman_iou": -0.28351920608084974
+    },
+    "net_errors": {
+      "pearson_iou": 0.07006154804635961,
+      "spearman_iou": 0.05808438269540809
+    },
+    "passage_width_correct_to_wrong": {
+      "pearson_iou": -0.3164763989461492,
+      "spearman_iou": -0.31126587812744083
+    },
+    "obstruction_correct_to_wrong": {
+      "pearson_iou": -0.009412796263163499,
+      "spearman_iou": -0.040697846377823976
+    },
+    "surface_condition_correct_to_wrong": {
+      "pearson_iou": 0.16585782544015315,
+      "spearman_iou": 0.1951800145897066
+    },
+    "level_change_correct_to_wrong": {
+      "pearson_iou": null,
+      "spearman_iou": null
+    },
+    "path_continuity_correct_to_wrong": {
+      "pearson_iou": -0.032419868948241296,
+      "spearman_iou": -0.027066598098038335
+    },
+    "obstacle_type_correct_to_wrong": {
+      "pearson_iou": -0.08801749239165377,
+      "spearman_iou": -0.08535229873856608
+    },
+    "surface_obstacle_correct_to_wrong": {
+      "pearson_iou": -0.29936497386748795,
+      "spearman_iou": -0.22912878474779197
+    }
+  },
+  "low_iou": {
+    "n": 10,
+    "mean_iou": 0.2792082025260051,
+    "correct_to_wrong": 12,
+    "wrong_to_correct": 9,
+    "unchanged": 2
+  },
+  "high_iou": {
+    "n": 10,
+    "mean_iou": 0.7488359802300997,
+    "correct_to_wrong": 7,
+    "wrong_to_correct": 5,
+    "unchanged": 2
+  }
+}
