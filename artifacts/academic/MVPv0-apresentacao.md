@@ -449,7 +449,7 @@ Nenhum asset visual externo foi usado.
 <!-- _class: no-page -->
 <!-- _backgroundColor: #f7f8f5 -->
 
-![bg right:52% cover](../../s/data/obstacles/crops/gsv-pittsburgh-16082-Obstacle.png)
+![bg right:52% cover](../../data/obstacles/crops/gsv-pittsburgh-16082-Obstacle.png)
 
 <div class="cover">
   <div class="eyebrow">Projeto Transformador I · MVPv0</div>
@@ -463,7 +463,7 @@ Nenhum asset visual externo foi usado.
 
 <!-- _class: no-page -->
 
-![bg left:42% cover](../../s/data/obstacles/crops/gsv-chicago-2844-Obstacle.png)
+![bg left:42% cover](../../data/obstacles/crops/gsv-chicago-2844-Obstacle.png)
 
 <div class="problem-copy">
   <div class="eyebrow">Problema e usuário</div>
@@ -545,17 +545,17 @@ Nenhum asset visual externo foi usado.
 
 <div class="demo-grid">
   <div class="demo-item">
-    <img src="../../s/data/obstacles/crops/gsv-pittsburgh-15968-Obstacle.png" alt="Trecho com vegetação">
+    <img src="../../data/obstacles/crops/gsv-pittsburgh-15968-Obstacle.png" alt="Trecho com vegetação">
     <p class="demo-class">Transitável</p>
     <p class="demo-meta">vegetation · probabilidade 0.45</p>
   </div>
   <div class="demo-item">
-    <img src="../../s/data/obstacles/crops/gsv-pittsburgh-2078-Obstacle.png" alt="Veículo estacionado">
+    <img src="../../data/obstacles/crops/gsv-pittsburgh-2078-Obstacle.png" alt="Veículo estacionado">
     <p class="demo-class">Parcialmente transitável</p>
     <p class="demo-meta">parked-car · probabilidade 0.99</p>
   </div>
   <div class="demo-item">
-    <img src="../../s/data/obstacles/crops/gsv-pittsburgh-7753-Obstacle.png" alt="Trecho em obra">
+    <img src="../../data/obstacles/crops/gsv-pittsburgh-7753-Obstacle.png" alt="Trecho em obra">
     <p class="demo-class">Não transitável</p>
     <p class="demo-meta">construction · probabilidade 0.94</p>
   </div>
