@@ -2,6 +2,8 @@ import base64
 import json
 import os
 import unittest
+import secrets
+from argon2 import PasswordHasher
 from concurrent.futures import ThreadPoolExecutor
 from threading import Event
 from datetime import datetime, timedelta, timezone
@@ -15,6 +17,18 @@ from api.config import Settings
 from api.main import create_app
 from ml.pipeline import apply_profile
 from PIL import Image
+
+
+TEST_PASSWORD = secrets.token_urlsafe(24)
+AUTH_ENV = {"AUTH_USERNAME": "test-demo", "AUTH_PASSWORD_HASH": PasswordHasher().hash(TEST_PASSWORD),
+            "JWT_SECRET": secrets.token_urlsafe(48), "JWT_EXPIRATION_MINUTES": "120"}
+
+
+def authorize(client):
+    response = client.post("/auth/login", json={"username": AUTH_ENV["AUTH_USERNAME"], "password": TEST_PASSWORD})
+    if response.status_code != 200:
+        raise AssertionError("Login de teste falhou")
+    client.headers["Authorization"] = "Bearer " + response.json()["access_token"]
 
 
 def image_bytes(size=(24, 16), format="PNG"):
@@ -31,6 +45,9 @@ def metadata(date=None):
 
 class APITests(unittest.TestCase):
     def setUp(self):
+        self.auth_env = patch.dict(os.environ, AUTH_ENV)
+        self.auth_env.start()
+        self.addCleanup(self.auth_env.stop)
         self.app = create_app(Settings(cors_origins=("https://mobiliza.example",)))
         self.components = (None, None, None, None, "cpu", {})
         self.load = patch("api.main.load_components", return_value=self.components).start()
@@ -39,6 +56,7 @@ class APITests(unittest.TestCase):
         self.client = TestClient(self.app)
         self.client.__enter__()
         self.addCleanup(self.client.__exit__, None, None, None)
+        authorize(self.client)
 
     def scene(self, image, *, observation, components):
         self.assertIs(components, self.components)
@@ -150,6 +168,11 @@ class APITests(unittest.TestCase):
 
 @unittest.skipUnless(os.getenv("MOBILIZA_RUN_REAL_API_TEST") == "1", "Integração real opt-in requer checkpoints")
 class RealAPIIntegrationTests(unittest.TestCase):
+    def setUp(self):
+        auth_env = patch.dict(os.environ, AUTH_ENV)
+        auth_env.start()
+        self.addCleanup(auth_env.stop)
+
     def test_modal_bundle_cpu_offline(self):
         from pathlib import Path
         from time import perf_counter
@@ -163,6 +186,7 @@ class RealAPIIntegrationTests(unittest.TestCase):
         with patch.dict(os.environ, {"HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"}), \
              patch("transformers.AutoModel.from_pretrained", side_effect=AssertionError("Pesos-base não devem ser carregados")), \
              TestClient(create_app(settings)) as client:
+            authorize(client)
             self.assertEqual(client.get("/health").json()["device"], "cpu")
             with image.open("rb") as handle:
                 response = client.post("/transitability", data={"metadata": json.dumps(metadata())},
@@ -186,6 +210,7 @@ class RealAPIIntegrationTests(unittest.TestCase):
         payload = metadata()
         payload["profiles"].append({**payload["profiles"][0], "minimum_passage_width": "wide"})
         with TestClient(create_app()) as client, image.open("rb") as handle:
+            authorize(client)
             self.assertEqual(client.get("/health").status_code, 200)
             response = client.post("/transitability", data={"metadata": json.dumps(payload)}, files={"image": (image.name, handle, "image/png")})
             self.assertEqual(response.status_code, 200, response.text)

@@ -31,3 +31,31 @@ class Settings:
             **{name: int(os.getenv("MOBILIZA_" + name.upper(), str(getattr(cls, name))))
                for name in ("max_image_bytes", "max_pixels", "max_dimension", "max_concurrency")},
         )
+
+
+@dataclass(frozen=True, repr=False)
+class AuthSettings:
+    username: str
+    password_hash: str
+    jwt_secret: str
+    expiration_minutes: int = 120
+
+    def __post_init__(self):
+        from argon2 import extract_parameters, Type
+        try:
+            valid_hash = extract_parameters(self.password_hash).type == Type.ID
+        except Exception:
+            valid_hash = False
+        if (not self.username.strip() or not valid_hash or
+                len(self.jwt_secret.encode("utf-8")) < 32 or self.expiration_minutes <= 0):
+            raise ValueError("Configuração de autenticação ausente ou inválida")
+
+    @classmethod
+    def from_env(cls):
+        try:
+            return cls(username=os.environ["AUTH_USERNAME"],
+                       password_hash=os.environ["AUTH_PASSWORD_HASH"],
+                       jwt_secret=os.environ["JWT_SECRET"],
+                       expiration_minutes=int(os.getenv("JWT_EXPIRATION_MINUTES", "120")))
+        except (KeyError, ValueError):
+            raise RuntimeError("Configuração de autenticação ausente ou inválida") from None

@@ -28,6 +28,7 @@ app = modal.App(APP_NAME)
 
 @app.function(
     image=image,
+    secrets=[modal.Secret.from_name("mobiliza-auth", required_keys=["AUTH_USERNAME", "AUTH_PASSWORD_HASH", "JWT_SECRET", "JWT_EXPIRATION_MINUTES"])],
     volumes={"/models": volume.with_mount_options(read_only=True)},
     cpu=2,
     memory=4096,

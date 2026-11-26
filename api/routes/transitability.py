@@ -9,7 +9,7 @@ from PIL import Image, UnidentifiedImageError
 from pydantic import ValidationError
 from starlette.concurrency import run_in_threadpool
 
-from api.dependencies import get_components
+from api.dependencies import get_components, get_current_user
 from api.schemas.transitability import TransitabilityInput, TransitabilityOutput
 from ml.mobility_profile import MobilityProfile
 from ml.observation import evaluate_observation
@@ -73,11 +73,12 @@ def process_upload(upload, payload, settings, components):
 
 
 @router.post("/transitability", response_model=TransitabilityOutput,
-             responses={413: {"description": "Limite de tamanho ou dimensões"}, 415: {"description": "Formato não suportado"},
+             responses={401: {"description": "Autenticação necessária"}, 429: {"description": "Limite de inferências"},
+                        413: {"description": "Limite de tamanho ou dimensões"}, 415: {"description": "Formato não suportado"},
                         422: {"description": "Entrada inválida"}, 503: {"description": "Modelos indisponíveis ou capacidade ocupada"}})
 async def transitability(request: Request, image: Annotated[UploadFile, File()],
                          metadata: Annotated[str, Form(description="JSON conforme TransitabilityInput")],
-                         components=Depends(get_components)):
+                         components=Depends(get_components), user=Depends(get_current_user)):
     try:
         try:
             payload = TransitabilityInput.model_validate_json(metadata)

@@ -42,6 +42,12 @@ def main():
         from api.config import Settings
         from api.main import create_app
 
+        import os
+        import secrets
+        from argon2 import PasswordHasher
+        password = secrets.token_urlsafe(24)
+        auth_env = {"AUTH_USERNAME": "runtime-validation", "AUTH_PASSWORD_HASH": PasswordHasher().hash(password),
+                    "JWT_SECRET": secrets.token_urlsafe(48), "JWT_EXPIRATION_MINUTES": "120"}
         bundle = args.bundle.resolve()
         settings = Settings(segformer_checkpoint=bundle / "segformer/best_segformer.pt",
                             dino_checkpoint=bundle / "dinov2/best_dinov2_v2.pt", device="cpu")
@@ -51,10 +57,14 @@ def main():
                                   "level_change_tolerance": "minor", "accepts_partial_obstruction": True}],
                     "observation": {"source": "runtime_validation_simulated_timestamp", "observed_at": datetime.now(timezone.utc).isoformat()}}
         image = Path("data/annotation-pilot/images/curb_ramp/gsv-amsterdam-18384-CurbRamp.png")
-        with patch("transformers.AutoModel.from_pretrained", side_effect=AssertionError("Download de pesos-base não permitido")), TestClient(create_app(settings)) as client:
+        with patch.dict(os.environ, auth_env), patch("transformers.AutoModel.from_pretrained", side_effect=AssertionError("Download de pesos-base não permitido")), TestClient(create_app(settings)) as client:
             health = client.get("/health")
             if health.status_code != 200:
                 raise RuntimeError(f"Falha no carregamento estrito: {health.text}")
+            login = client.post("/auth/login", json={"username": auth_env["AUTH_USERNAME"], "password": password})
+            if login.status_code != 200:
+                raise RuntimeError("Falha na autenticação de integração")
+            client.headers["Authorization"] = "Bearer " + login.json()["access_token"]
             with image.open("rb") as handle:
                 response = client.post("/transitability", data={"metadata": json.dumps(metadata)}, files={"image": (image.name, handle, "image/png")})
             if response.status_code != 200 or response.json()["mask"] is None:
@@ -63,7 +73,7 @@ def main():
         if hashes != {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}:
             raise RuntimeError("Checkpoint alterado")
         report.update(checkpoints_loaded_strictly=True, checkpoint_hashes=hashes,
-                      inference_device="cpu", classification=result["assessments"][0]["classification"],
+                      authentication_verified=True, inference_device="cpu", classification=result["assessments"][0]["classification"],
                       timestamp_simulated=True, model_download_disabled=True)
     text = json.dumps(report, indent=2, ensure_ascii=False)
     if args.output:

@@ -36,7 +36,7 @@ cannot independently decide transitability. Temporal validation prevents outdate
 or undated observations from supporting decisions.
 
 [ml/pipeline.py](ml/pipeline.py) exposes `observe_scene()`, `apply_profile()` and
-`infer_transitability()`. FastAPI reuses them, loading models once per process
+`infer_transitability()`. FastAPI reuses them with JWT-protected inference, loading models once per process
 and applying up to eight profiles without repeating perception. There is no
 database, persisted upload store, map or routing service in this repository.
 
@@ -342,6 +342,10 @@ without relaxing loading or renaming weights.
 
 ### Local execution
 
+First configure the four authentication variables using the commands in
+[Authentication](#authentication). Startup fails before loading models if the
+authentication configuration is missing or invalid. Then run:
+
 ```bash
 python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --workers 1
 ```
@@ -400,6 +404,10 @@ and `/openapi.json`. Input/output definitions are in [api/schemas](api/schemas).
 | `MOBILIZA_MAX_PIXELS` | 8000000 |
 | `MOBILIZA_MAX_DIMENSION` | 8192 pixels |
 | `MOBILIZA_MAX_CONCURRENCY` | 1 |
+| `AUTH_USERNAME` | required demonstration username |
+| `AUTH_PASSWORD_HASH` | required Argon2id encoded hash |
+| `JWT_SECRET` | required signing key, at least 32 UTF-8 bytes |
+| `JWT_EXPIRATION_MINUTES` | 120 (2 hours) |
 
 ### GET /health
 
@@ -411,6 +419,65 @@ HTTP 200 means both models are loaded; readiness does not run inference:
 
 Startup failure leaves health available with HTTP 503, `status="unavailable"`,
 `models_loaded=false` and `device=null`.
+
+### Authentication
+
+`POST /auth/login` accepts JSON `{"username": "...", "password": "..."}` and
+returns `access_token`, `token_type="bearer"` and `expires_in` (seconds), with
+`Cache-Control: no-store`. Invalid credentials return **401** without revealing
+whether the username or password was wrong. Only the Argon2id hash is configured;
+plaintext passwords are not stored. JWTs use HS256 with a fixed issuer/audience,
+required subject/issued-at/expiration claims and signature validation. There are
+no public registrations, refresh tokens, database or external authentication service.
+
+Generate local configuration in PowerShell without putting passwords in commands
+or printing generated secrets. The password prompt does not echo its input:
+
+```powershell
+$env:AUTH_USERNAME=Read-Host "Demonstration username"
+$env:AUTH_PASSWORD_HASH=python -c "import getpass; from argon2 import PasswordHasher; print(PasswordHasher().hash(getpass.getpass('Demonstration password: ')))"
+$env:JWT_SECRET=python -c "import secrets; print(secrets.token_urlsafe(48))"
+$env:JWT_EXPIRATION_MINUTES="120"
+```
+
+These values stay in the current shell; start the local API from that shell.
+For production, configure the Modal Secret below. Never commit or log these
+values, login bodies or access tokens. Local `.env*` files are ignored. A JWT
+is a bearer credential, not encrypted storage; its payload contains no password.
+
+Login to a running local/remote API using PowerShell, keeping the token in memory:
+
+```powershell
+$apiUrl="http://127.0.0.1:8000" # use the HTTPS Modal URL in production
+$credential=Get-Credential -UserName $env:AUTH_USERNAME -Message "Mobiliza demonstration login"
+$loginBody=@{username=$credential.UserName; password=$credential.GetNetworkCredential().Password} | ConvertTo-Json
+$session=Invoke-RestMethod -Method Post -Uri "$apiUrl/auth/login" -ContentType "application/json" -Body $loginBody
+Remove-Variable loginBody,credential
+```
+
+Do not print `$session` or persist tokens in browser localStorage. The frontend
+must send `Authorization: Bearer <access_token>`; expiration requires a new login.
+Swagger UI's **Authorize** accepts the access token. Missing, expired, modified
+or otherwise invalid tokens return **401** with `WWW-Authenticate: Bearer`.
+Authentication is checked **before receiving/parsing the multipart body**, image
+validation, admission to the inference slot or perception. CORS allows the
+`Authorization` header for configured origins; `/health` remains public and
+contains no credentials or configuration paths.
+
+Abuse limits use a 60-second sliding window: **5 login requests globally per
+process** (successful or failed), and **10 inference requests per authenticated
+username**, including authenticated requests later rejected for invalid input
+or busy capacity. A new token does not reset the user's allowance. Excess
+requests return **429** and `Retry-After`; concurrent password verifications are
+limited to one, and login bodies to 4 KiB. The global login limit is intentional
+for one shared demonstration account and avoids trusting client-supplied IP
+headers; another person's attempts can temporarily consume that allowance.
+
+Counters are in memory, reset on container shutdown/restart, and are not shared
+across processes/containers. Keep one API worker and the current single Modal
+container. This is demonstration protection, not a distributed quota or DDoS
+service. Public requests may still start a Modal container and incur startup
+cost; authentication blocks unauthorized inference, not all hosting costs.
 
 ### POST /transitability
 
@@ -445,10 +512,12 @@ an old image merely to pass validation.
 
 ```bash
 curl --fail-with-body http://127.0.0.1:8000/health
-curl --fail-with-body -X POST http://127.0.0.1:8000/transitability -F "image=@path/to/image.png;type=image/png" -F "metadata=<metadata.json"
+curl --fail-with-body -X POST http://127.0.0.1:8000/transitability -H "Authorization: Bearer $ACCESS_TOKEN" -F "image=@path/to/image.png;type=image/png" -F "metadata=<metadata.json"
 ```
 
-Use `curl.exe` on PowerShell. Profiles: 1–8, preserving order; extra fields are
+The curl example uses a Bash `$ACCESS_TOKEN` variable containing the login token;
+on PowerShell use `curl.exe` and `-H "Authorization: Bearer $($session.access_token)"`.
+Profiles: 1–8, preserving order; extra fields are
 rejected. Source is required. Validity: greater than zero, maximum 8760 hours.
 Evaluation time is server-controlled. Invalid temporal evidence returns
 **HTTP 200 with `undetermined`**, not a successful transitability claim.
@@ -474,14 +543,16 @@ Static JPEG, PNG and WebP are supported. MIME must match decoded content; bytes,
 pixels, dimensions and actual image validity are checked. There is no automatic
 EXIF rotation. Errors: **413** size/dimensions, **415** format/MIME, **422** invalid
 image/metadata, **503** unavailable models, inference failure or busy capacity.
-Saturation returns `Retry-After: 1`, without an internal queue.
+Invalid authentication returns **401**; exceeding auth/inference rate limits
+returns **429**. Inference-slot saturation remains **503** with `Retry-After: 1`,
+without an internal queue.
 
 The lifespan shares eval-mode models once per process. Validation, inference and
 PNG compression run outside the event loop; perception uses `torch.inference_mode()`.
 Admission control precedes multipart parsing; body allowance is image size plus
 128 KiB. One worker avoids duplicate model copies. Uploads are not persisted;
 the multipart parser may use an automatically closed system temporary file.
-CORS does not provide authentication; no authentication is implemented.
+JWT protects inference; CORS is only a browser-origin policy.
 
 ## Modal deployment
 
@@ -533,6 +604,26 @@ Do not recreate the existing Volume or reupload unchanged weights for a code
 redeploy. Use the same Modal profile/environment throughout; uploads do not
 silently overwrite files. Review/version any replacement separately.
 
+### Configure the Modal Secret
+
+After generating the environment variables above, create `mobiliza-auth` using a
+temporary ignored JSON file. It contains only username, password hash, signing
+key and expiration; no plaintext password. The command removes the file after
+upload without exposing values in CLI arguments:
+
+```powershell
+python -c "import json,os; from pathlib import Path; keys=('AUTH_USERNAME','AUTH_PASSWORD_HASH','JWT_SECRET','JWT_EXPIRATION_MINUTES'); Path('.env.auth.json').write_text(json.dumps({k:os.environ[k] for k in keys}),encoding='utf-8')"
+try { python -m modal secret create mobiliza-auth --from-json .env.auth.json } finally { Remove-Item -LiteralPath .env.auth.json }
+```
+
+This is a remote configuration command for you to execute, not performed by the
+implementation. If the named Secret already exists, review whether to replace
+it before using `--force`. The deploy references it through
+`secrets=[modal.Secret.from_name("mobiliza-auth", required_keys=[...])]`; it is not
+baked into the image or copied from local environment variables into source code.
+Changing the JWT key invalidates previously issued tokens. No Modal proxy token
+is needed by the frontend; authentication runs in FastAPI.
+
 ### Publish, verify and stop
 
 From the repository root, preserving existing CORS/Volume settings:
@@ -550,10 +641,21 @@ Volume. Deployed paths are `/models/segformer/best_segformer.pt` and
 ```powershell
 $apiUrl="https://YOUR-DEPLOYMENT.modal.run"
 curl.exe --fail-with-body --max-time 300 "$apiUrl/health"
-python deploy/check_remote.py --url $apiUrl --image path/to/image.png --metadata metadata.json
+python deploy/check_remote.py --url $apiUrl --username $env:AUTH_USERNAME --image path/to/image.png --metadata metadata.json
 ```
 
-The verifier requires valid temporal evidence and a mask to confirm perception.
+The verifier prompts for the demonstration password without echo, logs in and
+uses its JWT without printing it. It requires valid temporal evidence and a mask
+to confirm perception. Check protection separately:
+
+```powershell
+curl.exe --fail-with-body "$apiUrl/health" # public readiness
+curl.exe -i -X POST "$apiUrl/transitability" # expected 401, even without an image
+curl.exe -i -X POST "$apiUrl/transitability" -H "Authorization: Bearer invalid" # expected 401
+```
+
+The updated Python tests cover valid/invalid login, expired/tampered tokens,
+authorization before body reading, authorized inference and both rate limits.
 Stop compute when no longer needed:
 
 ```bash
@@ -577,7 +679,7 @@ python -m unittest discover -v
 git diff --check
 ```
 
-Latest local run: **121 tests, 119 passed and 2 opt-in integration tests skipped**;
+Latest authenticated local run: **132 tests passed, including both real integration tests**;
 `git diff --check` passed.
 
 Coverage includes annotation persistence, schema validation, split isolation,
@@ -594,13 +696,14 @@ Remove-Item Env:MOBILIZA_RUN_REAL_API_TEST
 For the pinned **Linux CPU** environment and full offline checkpoint/inference check:
 
 ```bash
-HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 python -m deploy.verify_runtime --cpu --bundle .modal-models --output artifacts/api-integration/linux-cpu-pinned.json
+HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 python -m deploy.verify_runtime --cpu --bundle .modal-models --output artifacts/api-integration/linux-cpu-authenticated.json
 ```
 
 Without `--bundle`, verification checks versions and DINO key structure without
 models/data, as during the Modal build. The recorded
-[Linux CPU verification](artifacts/api-integration/linux-cpu-pinned.json) strictly
-loaded both checkpoints, returned HTTP 200 with a mask, blocked downloads and
+[Authenticated Linux CPU verification](artifacts/api-integration/linux-cpu-authenticated.json) strictly
+loaded both checkpoints, logged in with ephemeral test credentials, returned
+HTTP 200 with a mask, blocked downloads and
 preserved weight hashes. Its timestamp is explicitly simulated. Local verification
 is not a remote latency/memory benchmark.
 
@@ -619,7 +722,8 @@ is not a remote latency/memory benchmark.
   correctly prevents a current transitability claim.
 - A single image cannot establish out-of-frame conditions or later changes.
   The common test is isolated but already observed during development.
-- No authentication, database, public map or route planning is implemented here.
+- One shared demonstration account is supported; no user database, public map
+  or route planning is implemented here. Rate limits reset with the container.
   The local annotation editor is not an end-user navigation interface.
 
 ## Academic records and references
@@ -648,7 +752,10 @@ Technical references: [Project Sidewalk](https://projectsidewalk.org/),
 [ASGI](https://modal.com/docs/guide/webhooks),
 [Volumes](https://modal.com/docs/guide/volumes),
 [scaling](https://modal.com/docs/guide/scale) and
-[CLI](https://modal.com/docs/reference/cli/app).
+[CLI](https://modal.com/docs/reference/cli/app),
+[Modal Secrets](https://modal.com/docs/guide/secrets),
+[Argon2id](https://argon2-cffi.readthedocs.io/en/stable/api.html) and
+[PyJWT](https://pyjwt.readthedocs.io/en/latest/usage.html).
 
 Research context retained from the earlier bibliography:
 [Accessibility for Whom?](https://arxiv.org/html/2502.19888v1) and
