@@ -1,4 +1,4 @@
-# Runtime funcional congelado; variantes CPU selecionadas no Modal.
+# Dependências de inferência compatíveis com os checkpoints funcionais V2.
 --extra-index-url https://download.pytorch.org/whl/cpu
 annotated-doc==0.0.4
 annotated-types==0.7.0
