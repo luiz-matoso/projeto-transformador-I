@@ -1,3 +1,5 @@
+from api.schemas.transitability import FunctionalProfileRequest
+from ml.functional_profile import functional_requirements, COMPLEMENTARY, TRANSLATION_NOTES
 import base64
 import logging
 from datetime import datetime, timedelta, timezone
@@ -64,9 +66,13 @@ def process_upload(upload, payload, settings, components):
     image.close()
     assessments = []
     for index, profile in enumerate(payload.profiles):
-        result = apply_profile(scene, MobilityProfile(**profile.model_dump()), validity_period=period, evaluated_at=now)
+        functional = profile.functional if isinstance(profile, FunctionalProfileRequest) else None
+        requirements = functional_requirements(functional.model_dump()) if functional is not None else MobilityProfile(**profile.model_dump())
+        result = apply_profile(scene, requirements, validity_period=period, evaluated_at=now)
+        if functional is not None:
+            result.update(functional=functional.model_dump(), unassessed_functional_needs=list(COMPLEMENTARY), translation_notes=list(TRANSLATION_NOTES))
         assessments.append({"profile_index": index, **{key: result[key] for key in
-                            ("profile", "classification", "severity", "reasons", "requires_review", "unassessed_features")}})
+                            ("profile", "classification", "severity", "reasons", "requires_review", "unassessed_features", "functional", "unassessed_functional_needs", "translation_notes") if key in result}})
     return {"mask": mask, "features": scene["features"], "predictions": scene["predictions"],
             "observation": result["observation"], "not_modeled": scene["not_modeled"],
             "inactive_features": scene["inactive_features"], "assessments": assessments}

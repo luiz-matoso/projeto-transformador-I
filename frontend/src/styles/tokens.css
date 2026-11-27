@@ -1,0 +1,48 @@
+@theme inline {
+  --color-surface: var(--surface);
+  --color-sidebar: var(--sidebar);
+  --color-subtle: var(--surface-subtle);
+  --color-selected: var(--selected);
+  --color-ink: var(--text);
+  --color-secondary: var(--secondary);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-control: var(--control-line);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-focus: var(--focus);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
+  --color-error: var(--error-surface);
+  --font-sans: Inter, system-ui, sans-serif;
+  --radius-control: 9px;
+  --spacing: 4px;
+  --default-transition-duration: 150ms;
+}
+/* Shared neutral design tokens. Semantic colors are confined to results and masks. */
+:root {
+  @apply font-normal text-ink bg-surface;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+  font-synthesis: none;
+  color-scheme: light;
+  --surface: #ffffff;
+  --sidebar: #fafafa;
+  --surface-subtle: #f6f6f6;
+  --selected: #ededed;
+  --text: #202020;
+  --secondary: #555555;
+  --muted: #737373;
+  --line: #e7e7e7;
+  --control-line: #d8d8d8;
+  --primary: #171717;
+  --primary-hover: #303030;
+  --focus: #777777;
+  --danger: #a33b32;
+  --warning: #85611d;
+  --error-surface: #faf5f4;
+  --mask-fill: #3b82f640;
+  --mask-stroke: #2863a4;
+  --backdrop: #00000040;
+  --radius: 9px;
+}

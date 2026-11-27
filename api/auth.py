@@ -78,3 +78,59 @@ class Authentication:
         except jwt.InvalidTokenError:
             raise unauthorized() from None
         return claims["sub"]
+
+
+def initialize_local_auth(env_file=None):
+    """Fill local auth settings without exposing or storing the password."""
+    import getpass
+    import os
+    import re
+    import tempfile
+    from pathlib import Path
+    from starlette.config import Config
+    from api.config import ENV_FILE
+
+    target = Path(env_file) if env_file is not None else ENV_FILE
+    if not target.is_file():
+        raise ValueError("Copie .env.example para .env antes de inicializar o acesso")
+    local = Config(target, environ={}, encoding="utf-8-sig")
+    if local("AUTH_PASSWORD_HASH", default="") or local("JWT_SECRET", default=""):
+        raise ValueError("O .env já possui credenciais; a configuração existente foi preservada")
+    username = input("Usuário: ").strip()
+    if not username or any(c in username for c in "\r\n='\"#"):
+        raise ValueError("Informe um usuário sem aspas, # ou sinal de igual")
+    password = getpass.getpass("Senha: ")
+    confirm = getpass.getpass("Confirme a senha: ")
+    if not password or password != confirm:
+        raise ValueError("As senhas precisam ser iguais e não vazias")
+    values = {"AUTH_USERNAME": username, "AUTH_PASSWORD_HASH": PasswordHasher().hash(password),
+              "JWT_SECRET": secrets.token_urlsafe(48)}
+    text = target.read_text(encoding="utf-8-sig")
+    for key, value in values.items():
+        pattern = r"^\s*" + key + r"\s*=.*$"
+        if re.search(pattern, text, flags=re.MULTILINE):
+            text = re.sub(pattern, lambda match: key + "=" + value, text, flags=re.MULTILINE)
+        else:
+            text = text.rstrip() + "\n" + key + "=" + value + "\n"
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", prefix=".env.", dir=target.parent, delete=False) as handle:
+            temporary = Path(handle.name)
+            handle.write(text)
+        temporary.chmod(0o600)
+        os.replace(temporary, target)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Configuração local de autenticação do Permear")
+    parser.add_argument("command", choices=("init",))
+    parser.parse_args()
+    try:
+        initialize_local_auth()
+    except (ValueError, OSError) as error:
+        parser.exit(1, str(error) + "\n")
+    print("Acesso configurado no .env. A senha não foi armazenada.")

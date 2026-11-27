@@ -1,0 +1,151 @@
+.workspace {
+  @apply flex min-h-screen;
+}
+.sidebar {
+  @apply fixed bg-sidebar flex flex-col;
+  inset: 0 auto 0 0;
+  width: 240px;
+  padding: 28px 13px 18px;
+  border-right: 1px solid var(--line);
+  z-index: 20;
+}
+.brand {
+  @apply font-semibold whitespace-nowrap;
+  font-size: 16px;
+  letter-spacing: -0.5px;
+  padding: 5px 12px;
+}
+.sidebar nav {
+  @apply flex flex-col;
+  margin-top: 30px;
+  gap: 4px;
+}
+.sidebar nav a {
+  @apply flex items-center text-secondary;
+  gap: 11px;
+  padding: 9px 12px;
+  min-height: 37px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.sidebar nav a svg,
+.logout-button svg {
+  stroke-width: 1.6;
+}
+.sidebar nav a:hover {
+  @apply bg-subtle;
+}
+.sidebar nav a.active {
+  @apply bg-selected text-ink font-medium;
+}
+.logout-button {
+  @apply justify-start font-normal w-full;
+  margin-top: auto;
+  border-color: transparent;
+  background: transparent;
+}
+.workspace-body {
+  @apply flex-1 min-w-0;
+  margin-left: 240px;
+}
+#main-content {
+  padding: 88px 48px 64px;
+  max-width: 1320px;
+  margin: auto;
+}
+.mobile-topbar {
+  @apply hidden;
+}
+.home-page {
+  max-width: 820px;
+  margin: 22px auto 0;
+}
+.home-page .page-heading {
+  margin-bottom: 34px;
+}
+.home-page h1 {
+  @apply font-medium;
+  font-size: 26px;
+}
+.module-list {
+  @apply overflow-hidden;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+}
+.module-card {
+  @apply flex items-center bg-surface;
+  gap: 23px;
+  min-height: 106px;
+  padding: 19px 23px;
+  border-bottom: 1px solid var(--line);
+}
+.module-card:last-child {
+  border-bottom: 0;
+}
+.module-card:hover {
+  @apply bg-sidebar;
+}
+.module-visual {
+  @apply flex items-center justify-center shrink-0 bg-subtle text-secondary;
+  width: 66px;
+  height: 66px;
+  border-radius: 10px;
+}
+.module-visual svg {
+  stroke-width: 1.4;
+}
+.module-card > div {
+  @apply flex-1 min-w-0;
+}
+.module-card h2 {
+  @apply font-medium;
+  font-size: 15px;
+  margin: 0 0 6px;
+}
+.module-card p {
+  @apply text-muted;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.module-action {
+  @apply flex items-center bg-subtle shrink-0;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 16px;
+  font-size: 12px;
+}
+.password-field {
+  @apply relative;
+}
+.password-field input {
+  padding-right: 43px;
+}
+.password-field button {
+  @apply absolute text-muted;
+  right: 3px;
+  top: 4px;
+}
+.empty {
+  @apply text-center bg-surface;
+  padding: 60px 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.empty > svg {
+  @apply text-muted;
+  stroke-width: 1.4;
+  margin-bottom: 16px;
+}
+.empty h2 {
+  font-size: 17px;
+  margin-bottom: 10px;
+}
+.empty p {
+  @apply text-muted;
+  font-size: 13px;
+  max-width: 460px;
+  margin: auto;
+}
+.empty button {
+  margin-top: 20px;
+}

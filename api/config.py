@@ -1,14 +1,21 @@
-import os
 from dataclasses import dataclass
 from pathlib import Path
+from starlette.config import Config
+
+ROOT = Path(__file__).resolve().parents[1]
+ENV_FILE = ROOT / ".env"
+
+def environment() -> Config:
+    """Process variables override the optional local .env file."""
+    return Config(ENV_FILE if ENV_FILE.is_file() else None, encoding="utf-8-sig")
 
 
 @dataclass(frozen=True)
 class Settings:
-    segformer_checkpoint: Path = Path("artifacts/segmentation/common-dino-split/best_segformer.pt")
-    dino_checkpoint: Path = Path("artifacts/dinov2/v2/partial/best_dinov2_v2.pt")
-    device: str | None = None
-    cors_origins: tuple[str, ...] = ()
+    segformer_checkpoint: Path = Path(".modal-models/segformer/best_segformer.pt")
+    dino_checkpoint: Path = Path(".modal-models/dinov2/best_dinov2_v2.pt")
+    device: str | None = "cpu"
+    cors_origins: tuple[str, ...] = ("http://127.0.0.1:5173", "http://localhost:5173")
     max_image_bytes: int = 8 * 1024 * 1024
     max_pixels: int = 8_000_000
     max_dimension: int = 8192
@@ -23,12 +30,13 @@ class Settings:
 
     @classmethod
     def from_env(cls):
+        env = environment()
         return cls(
-            segformer_checkpoint=Path(os.getenv("MOBILIZA_SEGFORMER_CHECKPOINT", str(cls.segformer_checkpoint))),
-            dino_checkpoint=Path(os.getenv("MOBILIZA_DINO_CHECKPOINT", str(cls.dino_checkpoint))),
-            device=os.getenv("MOBILIZA_DEVICE") or None,
-            cors_origins=tuple(x.strip() for x in os.getenv("MOBILIZA_CORS_ORIGINS", "").split(",") if x.strip()),
-            **{name: int(os.getenv("MOBILIZA_" + name.upper(), str(getattr(cls, name))))
+            segformer_checkpoint=Path(env("MOBILIZA_SEGFORMER_CHECKPOINT", default=str(cls.segformer_checkpoint))),
+            dino_checkpoint=Path(env("MOBILIZA_DINO_CHECKPOINT", default=str(cls.dino_checkpoint))),
+            device=env("MOBILIZA_DEVICE", default=cls.device) or None,
+            cors_origins=tuple(x.strip() for x in env("MOBILIZA_CORS_ORIGINS", default=",".join(cls.cors_origins)).split(",") if x.strip()),
+            **{name: env("MOBILIZA_" + name.upper(), cast=int, default=getattr(cls, name))
                for name in ("max_image_bytes", "max_pixels", "max_dimension", "max_concurrency")},
         )
 
@@ -52,10 +60,11 @@ class AuthSettings:
 
     @classmethod
     def from_env(cls):
+        env = environment()
         try:
-            return cls(username=os.environ["AUTH_USERNAME"],
-                       password_hash=os.environ["AUTH_PASSWORD_HASH"],
-                       jwt_secret=os.environ["JWT_SECRET"],
-                       expiration_minutes=int(os.getenv("JWT_EXPIRATION_MINUTES", "120")))
+            return cls(username=env("AUTH_USERNAME", default=""),
+                       password_hash=env("AUTH_PASSWORD_HASH", default=""),
+                       jwt_secret=env("JWT_SECRET", default=""),
+                       expiration_minutes=env("JWT_EXPIRATION_MINUTES", cast=int, default=120))
         except (KeyError, ValueError):
             raise RuntimeError("Configuração de autenticação ausente ou inválida") from None

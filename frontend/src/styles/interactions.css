@@ -1,0 +1,113 @@
+.login-screen {
+  @apply min-h-svh flex items-center justify-center bg-white p-6;
+}
+.login-card {
+  @apply w-full max-w-[370px] rounded-[22px] border border-line bg-white px-9 py-10;
+}
+.login-brand {
+  @apply text-center text-[16px] font-medium mb-7;
+}
+.login-form {
+  @apply flex flex-col gap-5;
+}
+.login-form h1 {
+  @apply text-center text-[24px] mb-2;
+}
+.login-form .primary {
+  @apply w-full mt-2;
+}
+.password-field {
+  @apply relative;
+}
+.password-field input {
+  @apply pr-11;
+}
+.password-field button {
+  @apply absolute right-1 top-1;
+}
+.sidebar-footer {
+  @apply mt-auto flex flex-col gap-2 pt-5;
+}
+.sidebar-footer > a {
+  @apply flex items-center gap-3 px-3 py-2 text-[13px];
+}
+.sidebar-footer > span {
+  @apply px-3 text-[12px] text-muted break-all;
+}
+.nav-group {
+  @apply flex items-center gap-3 px-3 py-2 text-[13px] text-secondary mt-2;
+}
+.sidebar nav a.nav-child {
+  @apply pl-10;
+}
+.history-row {
+  @apply flex items-center justify-between gap-4 border-b border-line py-5;
+}
+.history-row h2 {
+  @apply m-0 text-[14px] break-all;
+}
+.history-row .inline-actions {
+  @apply mt-0 shrink-0;
+}
+.history-list {
+  @apply mt-5;
+}
+.skeleton {
+  @apply h-32 rounded-xl bg-subtle motion-safe:animate-pulse;
+}
+.page,
+.results,
+dialog[open] {
+  animation: appear 160ms ease-out;
+}
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+button,
+a,
+input,
+select,
+textarea,
+summary {
+  transition:
+    background-color 150ms,
+    border-color 150ms,
+    opacity 150ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.empty > svg {
+  @apply mx-auto;
+}
+.page.is-empty {
+  @apply flex flex-col;
+  min-height: calc(100svh - 180px);
+}
+.page.is-empty > .empty {
+  @apply flex flex-1 flex-col items-center justify-center border-0;
+  min-height: 300px;
+}
+.annotation-layout {
+  width: 100%;
+}
+.history-row + .pagination {
+  margin-top: 24px;
+}
+
+.page.is-empty > .empty p {
+  margin: 0;
+}
