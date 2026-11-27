@@ -1,6 +1,6 @@
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, model_validator
 
 
 class ProfileInput(BaseModel):
@@ -14,6 +14,33 @@ class ProfileInput(BaseModel):
     accepts_detour: StrictBool | None = None
 
 
+class FunctionalProfileInput(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    schema_version: Literal[1]
+    wheelchair_type: Literal["manual", "powered"]
+    assistance: Literal["none", "partial", "constant"]
+    narrow_spaces: Literal["without_difficulty", "with_difficulty", "unable"]
+    uneven_surfaces: Literal["without_difficulty", "with_difficulty", "unable"]
+    small_level_changes: Literal["without_difficulty", "with_difficulty", "unable"]
+    steps: Literal["without_difficulty", "with_difficulty", "unable"]
+    tight_maneuvers: Literal["without_difficulty", "with_difficulty", "unable"]
+    obstacle_avoidance: Literal["without_difficulty", "with_difficulty", "unable"]
+    requires_ramps: StrictBool
+    inclines: Literal["without_difficulty", "with_difficulty", "unable"]
+    accepts_detours: StrictBool
+
+    @model_validator(mode="after")
+    def check_translation(self):
+        from ml.functional_profile import functional_requirements
+        functional_requirements(self.model_dump())
+        return self
+
+
+class FunctionalProfileRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    functional: FunctionalProfileInput
+
+
 class ObservationInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     source: str = Field(min_length=1, max_length=200)
@@ -22,7 +49,7 @@ class ObservationInput(BaseModel):
 
 class TransitabilityInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    profiles: list[ProfileInput] = Field(min_length=1, max_length=8)
+    profiles: list[ProfileInput | FunctionalProfileRequest] = Field(min_length=1, max_length=8)
     observation: ObservationInput
     validity_hours: float = Field(default=24, gt=0, le=8760, allow_inf_nan=False)
 
@@ -51,6 +78,9 @@ class ValidityOutput(BaseModel):
 class AssessmentOutput(BaseModel):
     profile_index: int
     profile: ProfileInput
+    functional: FunctionalProfileInput | None = None
+    unassessed_functional_needs: list[str] | None = None
+    translation_notes: list[str] | None = None
     classification: Literal["transitable", "partially_transitable", "non_transitable", "undetermined"]
     severity: Literal["none", "moderate", "critical"]
     reasons: list[ReasonOutput]
