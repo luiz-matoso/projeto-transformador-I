@@ -12,6 +12,8 @@ from starlette.datastructures import Headers
 
 from api.config import Settings, AuthSettings
 from api.auth import Authentication, LOGIN_LIMIT, INFERENCE_LIMIT, RATE_WINDOW_SECONDS
+from api.storage import WorkspaceStorage
+from api.routes.workspace import router as workspace_router
 from api.routes.auth import router as auth_router
 from api.routes.transitability import router
 from api.schemas.transitability import HealthOutput, TransitabilityInput
@@ -26,7 +28,7 @@ class RequestLimits:
         self.app, self.max_bytes = app, max_bytes
 
     async def __call__(self, scope, receive, send):
-        if scope["type"] != "http" or scope["method"] != "POST" or scope["path"] not in ("/transitability", "/auth/login"):
+        if scope["type"] != "http" or not (scope["path"] in ("/transitability", "/auth/login") or scope["path"].split("/")[1] in ("profiles", "analyses")):
             return await self.app(scope, receive, send)
         application = scope["app"]
         auth = application.state.auth
@@ -43,16 +45,17 @@ class RequestLimits:
                                           headers=error.headers)(scope, receive, send)
             scope.setdefault("state", {})["auth_user"] = user
             key, limit = "inference:" + user, INFERENCE_LIMIT
-        if not auth.limiter.allow(key, limit):
+        if scope["path"] in ("/transitability", "/auth/login") and not auth.limiter.allow(key, limit):
             return await JSONResponse({"detail": "Limite de requisições excedido"}, status_code=429,
                                       headers={"Retry-After": str(RATE_WINDOW_SECONDS)})(scope, receive, send)
-        gate = application.state.login_gate if login else application.state.gate
+        gate = (application.state.login_gate if login else application.state.gate
+                if scope["path"] == "/transitability" else application.state.storage_gate)
         if gate.locked():
             status = 429 if login else 503
             return await JSONResponse({"detail": "Capacidade ocupada; tente novamente"}, status_code=status,
                                       headers={"Retry-After": "1"})(scope, receive, send)
         size = 0
-        max_bytes = 4096 if login else self.max_bytes
+        max_bytes = 4096 if login else self.max_bytes + (2 * 1024 * 1024 if scope["path"] == "/analyses" else 0)
         async def limited_receive():
             nonlocal size
             message = await receive()
@@ -72,8 +75,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def lifespan(app):
         app.state.auth = Authentication(AuthSettings.from_env())
         app.state.login_gate = asyncio.Semaphore(1)
+        app.state.storage_gate = asyncio.Semaphore(4)
         app.state.gate = asyncio.Semaphore(settings.max_concurrency)
         app.state.components = None
+        app.state.storage = WorkspaceStorage.from_env()
         try:
             app.state.components = await run_in_threadpool(load_components, settings.segformer_checkpoint, settings.dino_checkpoint, settings.device)
             logger.info("Modelos carregados; device=%s", app.state.components[4])
@@ -84,6 +89,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         finally:
             app.state.components = None
             app.state.auth = None
+            if app.state.storage is not None:
+                await app.state.storage.close()
             load_components.cache_clear()
 
     app = FastAPI(title="Mobiliza Transitability API", version="0.1.0", lifespan=lifespan)
@@ -92,9 +99,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.components = None
     app.add_middleware(RequestLimits, max_bytes=settings.max_image_bytes + 128 * 1024)
     app.add_middleware(CORSMiddleware, allow_origins=list(settings.cors_origins),
-                       allow_methods=["GET", "POST"], allow_headers=["Content-Type", "Authorization"], allow_credentials=False)
+                       allow_methods=["GET", "POST", "PUT", "DELETE"], allow_headers=["Content-Type", "Authorization"], allow_credentials=False)
     app.include_router(router)
     app.include_router(auth_router)
+    app.include_router(workspace_router)
 
     @app.exception_handler(RequestValidationError)
     async def invalid_request(request, error):
