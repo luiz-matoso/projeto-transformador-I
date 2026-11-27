@@ -22,30 +22,46 @@ INACTIVE_FEATURES = ("slope", "ramp_condition", "curb_access", "detour")
 
 
 @lru_cache(maxsize=1)
-def _load_components():
-    from transformers import AutoImageProcessor
+def _load_components(segformer_checkpoint: str | Path = SEGFORMER_CHECKPOINT,
+                     dino_checkpoint: str | Path = DINO_CHECKPOINT, device: str | None = None):
+    from transformers import AutoConfig, AutoImageProcessor, AutoModel
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    segmenter = load_segformer_predictor(SEGFORMER_CHECKPOINT, device=device)
-    model, checkpoint = load_checkpoint(DINO_CHECKPOINT, device=device)
+    device = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    segmenter = load_segformer_predictor(segformer_checkpoint, device=device)
+    dino_checkpoint = Path(dino_checkpoint)
+    config_path = dino_checkpoint.parent / "backbone_config"
+    if config_path.is_dir():
+        backbone = AutoModel.from_config(AutoConfig.from_pretrained(config_path, local_files_only=True))
+        model, checkpoint = load_checkpoint(dino_checkpoint, device=device, backbone=backbone)
+    else:
+        model, checkpoint = load_checkpoint(dino_checkpoint, device=device)
     model.eval()
-    processor = AutoImageProcessor.from_pretrained(DINO_CHECKPOINT.parent / "image_processor", local_files_only=True)
+    processor = AutoImageProcessor.from_pretrained(dino_checkpoint.parent / "image_processor", local_files_only=True)
     # A avaliação congelada da v2 utiliza 0.5; não há thresholds calibrados nesse checkpoint.
     thresholds = {head: (0.5,) * len(model.classes[head]) for head in MULTILABEL_HEADS}
     return segmenter, model, processor, thresholds, device, checkpoint["config"]["excluded_targets"]
 
 
-def observe_scene(image_path: str | Path, *, observation: dict | None = None) -> dict:
+load_components = _load_components
+
+
+@torch.inference_mode()
+def observe_scene(image_path: str | Path | Image.Image, *, observation: dict | None = None, components=None) -> dict:
     """Executa a percepção uma vez, permitindo reaplicar perfis à mesma cena."""
-    with Image.open(image_path) as source:
-        image = source.convert("RGB")
-    segmenter, model, processor, thresholds, device, excluded = _load_components()
+    if isinstance(image_path, Image.Image):
+        image = image_path if image_path.mode == "RGB" else image_path.convert("RGB")
+        path = None
+    else:
+        with Image.open(image_path) as source:
+            image = source.convert("RGB")
+        path = str(image_path)
+    segmenter, model, processor, thresholds, device, excluded = components if components is not None else _load_components()
     suggestion = predict_circulation_path(segmenter, image)
     focused = emphasize_circulation_mask(image, Image.fromarray(suggestion.mask * 255))
     predictions = predict_image(model, processor, model.classes, thresholds, device, focused)
     features = {head: predictions[head]["prediction"] for head in CATEGORICAL_HEADS if head in predictions}
     features.update({head: predictions[head]["predictions"] for head in MULTILABEL_HEADS if head in predictions})
-    return {"image_path": str(image_path), "mask": suggestion.mask, "features": features,
+    return {"image_path": path, "mask": suggestion.mask, "features": features,
             "predictions": predictions, "not_modeled": excluded,
             "inactive_features": list(INACTIVE_FEATURES), "observation": observation}
 

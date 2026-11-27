@@ -20,5 +20,10 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["ml*", "tools*"]
+include = ["ml*", "tools*", "api*"]
+
+[project.optional-dependencies]
+api = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1", "python-multipart>=0.0.18", "PyJWT==2.15.1", "argon2-cffi==25.1.0"]
+api-test = ["httpx>=0.27,<1"]
+deploy = ["modal>=1.6.4,<2"]
 
