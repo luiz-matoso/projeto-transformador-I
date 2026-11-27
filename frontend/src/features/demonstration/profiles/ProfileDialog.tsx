@@ -13,7 +13,7 @@ export function ProfileDialog({value,onClose,onSave}:{value:SavedProfile;onClose
   const [step,setStep]=useState(0),[error,setError]=useState(""),[busy,setBusy]=useState(false);
   useEffect(()=>{dialog.current?.showModal();},[]);
   const ability=(key:keyof FunctionalProfile)=> <div className="profile-question" key={key}>
-    <span>{functionalSpec.questions[key]}{key==="tight_maneuvers" && <small>Complementar · não avaliado automaticamente</small>}</span>
+    <span>{functionalSpec.questions[key]}</span>
     <ChoiceGroup label={functionalSpec.questions[key]} value={String(answers[key] ?? "")} options={Object.entries(functionalSpec.abilities).map(([value,label])=>({value,label,tone:value==="unable"?"critical":value==="with_difficulty"?"caution":"favorable"}))} onChange={v=>setAnswers(a=>({...a,[key]:v}))}/>
   </div>;
   function choices(key:"wheelchair_type"|"assistance"|"requires_ramps"|"accepts_detours",label:string,options:Record<string,string>) {
@@ -46,7 +46,6 @@ export function ProfileDialog({value,onClose,onSave}:{value:SavedProfile;onClose
             {(["narrow_spaces","uneven_surfaces","small_level_changes","steps","tight_maneuvers","obstacle_avoidance"] as const).map(ability)}
           </section>
           <section hidden={step!==2} aria-label="Necessidades complementares">
-            <p className="complementary-note">Não avaliadas automaticamente pelos modelos atuais.</p>
             {choices("requires_ramps","Necessita de rampas para mudanças de nível?",{true:"Sim",false:"Não"})}
             {ability("inclines")}
             {choices("accepts_detours","Aceita realizar desvios durante o percurso?",{true:"Sim",false:"Não"})}

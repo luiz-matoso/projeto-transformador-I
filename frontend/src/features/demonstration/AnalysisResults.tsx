@@ -119,9 +119,6 @@ export function AnalysisResults({
                     )[a.severity]
                   }
                 </p>
-                {a.unassessed_functional_needs?.length ? <div className="complementary-note">
-                  Não avaliado automaticamente: {a.unassessed_functional_needs.map(k=>({tight_maneuvers:"manobras em espaços reduzidos",requires_ramps:"necessidade de rampas",inclines:"circulação em inclinações",accepts_detours:"aceitação de desvios"})[k as "tight_maneuvers"]).join(", ")}. A classificação cobre somente os requisitos suportados.
-                </div> : null}
                 {a.requires_review && (
                   <p className="review">Revisão necessária</p>
                 )}
@@ -166,11 +163,6 @@ export function AnalysisResults({
               </article>
             ))}
           </div>
-          <p className="caption interpretation">
-            Não transitável indica incompatibilidade confirmada. Indeterminado
-            indica informação insuficiente ou inválida. A avaliação não
-            substitui inspeção presencial.
-          </p>
         </div>
       ) : (
         <div role="tabpanel">
