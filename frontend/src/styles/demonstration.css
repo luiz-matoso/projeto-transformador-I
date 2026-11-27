@@ -1,0 +1,217 @@
+.demo-page {
+  max-width: 1000px;
+  margin-inline: auto;
+}
+.demo-form {
+  max-width: 1000px;
+  margin-inline: auto;
+}
+.demo-input-layout {
+  @apply grid items-start;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 38px;
+}
+.upload-area {
+  @apply relative flex items-center justify-center bg-sidebar text-center cursor-pointer;
+  gap: 12px;
+  min-height: 290px;
+  padding: 28px;
+  border: 1px dashed var(--control-line);
+  border-radius: 12px;
+}
+.upload-area.has-file {
+  min-height: 120px;
+}
+.upload-area input {
+  @apply absolute w-full p-0 cursor-pointer;
+  inset: 0;
+  height: 100%;
+  opacity: 0;
+}
+.upload-area:focus-within {
+  outline: 1px solid var(--focus);
+  outline-offset: 2px;
+}
+.upload-area svg {
+  @apply text-muted;
+  stroke-width: 1.4;
+}
+.upload-area strong {
+  @apply font-medium max-w-full;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.upload-area span {
+  @apply text-muted;
+  font-size: 12px;
+}
+.mask-view {
+  @apply block w-full max-w-full h-auto object-contain bg-subtle;
+  max-height: 490px;
+  border-radius: 9px;
+}
+.image-input > .mask-view {
+  margin-top: 16px;
+}
+.observation-form {
+  @apply flex flex-col;
+  gap: 22px;
+}
+.profile-selects {
+  @apply grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.observation-dates {
+  @apply grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 16px;
+}
+.observation-form .caption {
+  margin-top: -8px;
+}
+.inline-actions {
+  @apply flex items-center flex-wrap;
+  gap: 8px;
+  margin-top: 15px;
+}
+.analyze-button {
+  align-self: flex-end;
+  min-width: 145px;
+  margin-top: 3px;
+}
+.results > div[role="tabpanel"] {
+  margin-top: 25px;
+}
+.result-images {
+  @apply grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-bottom: 25px;
+}
+.result-images figure {
+  @apply min-w-0 m-0;
+}
+.result-images figcaption {
+  @apply font-medium;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.result-images .mask-view {
+  @apply object-contain;
+  max-height: 290px;
+  aspect-ratio: 1.5;
+}
+.mask-unavailable {
+  @apply flex items-center justify-center text-center text-muted;
+  aspect-ratio: 1.5;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 28px;
+  font-size: 13px;
+}
+.validity {
+  @apply flex items-start bg-subtle;
+  gap: 12px;
+  padding: 17px 20px;
+  border-radius: 9px;
+  font-size: 13px;
+}
+.validity > svg {
+  @apply shrink-0;
+  margin-top: 2px;
+}
+.validity > div {
+  @apply flex-1 min-w-0;
+}
+.validity p {
+  @apply text-secondary;
+  font-size: 13px;
+  margin-top: 5px;
+}
+.validity strong {
+  @apply font-medium;
+}
+.validity details {
+  @apply border-0;
+  padding: 10px 0 0;
+  font-size: 12px;
+}
+.validity dl {
+  font-size: 12px;
+  margin-bottom: 0;
+}
+.assessment-pair {
+  @apply grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin: 24px 0;
+}
+.assessment {
+  @apply min-w-0;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.assessment-profile {
+  @apply text-secondary;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.classification {
+  font-size: 21px;
+  letter-spacing: -0.4px;
+}
+.classification.non_transitable {
+  @apply text-danger;
+}
+.classification.partially_transitable {
+  @apply text-warning;
+}
+.classification.transitable,
+.classification.undetermined {
+  @apply text-ink;
+}
+.severity {
+  @apply text-muted;
+  font-size: 12px;
+  margin-top: 10px;
+}
+.assessment ul {
+  @apply p-0;
+  margin: 20px 0 0;
+  list-style: none;
+}
+.assessment li {
+  padding: 15px 0;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.assessment li:last-child {
+  padding-bottom: 0;
+}
+.assessment details {
+  @apply border-0;
+  font-size: 12px;
+  padding: 8px 0 0;
+}
+.assessment dl > div {
+  grid-template-columns: 1fr;
+  font-size: 12px;
+  gap: 3px;
+  padding: 6px 0;
+}
+.assessment > p:last-child:not(.assessment-profile) {
+  font-size: 13px;
+  margin-top: 18px;
+}
+.review {
+  @apply text-secondary;
+  font-size: 12px;
+  margin-top: 12px;
+}
+.interpretation {
+  max-width: 780px;
+  margin-top: 20px;
+}

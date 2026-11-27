@@ -1,0 +1,293 @@
+.nav-scrim {
+  @apply hidden;
+}
+@media (min-width: 1600px) {
+  #main-content {
+    padding-top: 78px;
+  }
+  .home-page {
+    margin-top: 15px;
+  }
+}
+@media (max-width: 1150px) {
+  #main-content {
+    padding: 42px 30px;
+  }
+  .sidebar {
+    width: 220px;
+  }
+  .workspace-body {
+    margin-left: 220px;
+  }
+  .brand {
+    font-size: 15px;
+    padding-left: 8px;
+  }
+  .home-page {
+    margin-top: 10px;
+  }
+  .module-card {
+    gap: 18px;
+    padding: 17px 20px;
+  }
+  .annotation-layout {
+    grid-template-columns: minmax(0, 1.1fr) minmax(300px, 1fr);
+    gap: 22px;
+  }
+  .demo-input-layout {
+    gap: 25px;
+  }
+  .observation-dates {
+    grid-template-columns: 1fr;
+  }
+  .profile-card {
+    padding: 20px;
+  }
+  .image-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 850px) {
+  .sidebar {
+    width: 205px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .workspace-body {
+    margin-left: 205px;
+  }
+  .brand {
+    font-size: 14px;
+  }
+  .demo-input-layout {
+    grid-template-columns: 1fr;
+  }
+  .image-input {
+    max-width: 560px;
+  }
+  .upload-area {
+    min-height: 200px;
+  }
+  .profile-list {
+    grid-template-columns: 1fr;
+  }
+  .annotation-layout {
+    grid-template-columns: 1fr;
+  }
+  .annotation-image {
+    position: static;
+  }
+  .polygon-frame {
+    max-height: none;
+  }
+  .home-page .module-card {
+    gap: 14px;
+  }
+  .module-visual {
+    width: 50px;
+    height: 50px;
+  }
+  .module-card p {
+    font-size: 12px;
+  }
+  .result-images .mask-view {
+    max-height: 230px;
+  }
+}
+@media (max-width: 650px) {
+  .sidebar {
+    width: 232px;
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .brand {
+    font-size: 16px;
+  }
+  .workspace-body {
+    margin-left: 0;
+  }
+  .mobile-topbar {
+    @apply flex items-center;
+    gap: 12px;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+  }
+  .nav-scrim {
+    @apply block fixed border-0;
+    inset: 0;
+    border-radius: 0;
+    background: var(--backdrop);
+    z-index: 19;
+  }
+  .nav-scrim:hover:not(:disabled) {
+    background: var(--backdrop);
+  }
+  #main-content {
+    padding: 30px 20px;
+  }
+  .home-page {
+    margin-top: 0;
+  }
+  .page-heading {
+    @apply items-center;
+    margin-bottom: 25px;
+    gap: 15px;
+  }
+  .page-heading h1 {
+    font-size: 25px;
+  }
+  .page-heading button {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+  .module-card {
+    min-height: 105px;
+    padding: 17px 15px;
+    gap: 13px;
+  }
+  .module-visual {
+    width: 45px;
+    height: 50px;
+    border-radius: 8px;
+  }
+  .module-visual svg {
+    width: 21px;
+  }
+  .module-card h2 {
+    font-size: 14px;
+  }
+  .module-card p {
+    font-size: 12px;
+  }
+  .module-action {
+    font-size: 11px;
+    padding: 6px 7px;
+    gap: 3px;
+  }
+  .module-action svg {
+    @apply hidden;
+  }
+  .profile-selects {
+    gap: 12px;
+  }
+  .observation-form {
+    gap: 20px;
+  }
+  .result-images,
+  .assessment-pair {
+    grid-template-columns: 1fr;
+  }
+  .result-images .mask-view {
+    max-height: 310px;
+  }
+  .assessment {
+    padding: 21px;
+  }
+  .assessment-pair {
+    gap: 16px;
+  }
+  .validity {
+    padding: 16px;
+  }
+  .validity dl > div {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+  .filterbar {
+    @apply flex-wrap;
+  }
+  .filterbar input {
+    max-width: none;
+  }
+  .filterbar select {
+    max-width: 190px;
+  }
+  .dataset-summary {
+    @apply items-start flex-col;
+    gap: 8px;
+  }
+  .image-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dataset-actions {
+    gap: 8px;
+  }
+  .dataset-actions button {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+  .page-heading select {
+    max-width: 175px;
+    font-size: 12px;
+  }
+  .dataset-records .metric-lines {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  .metric-lines > div {
+    @apply flex-row justify-between items-center;
+  }
+  .metric-lines strong {
+    font-size: 18px;
+  }
+  .profile-dialog {
+    padding: 22px;
+  }
+  .profile-card-heading h2 {
+    font-size: 15px;
+  }
+  .profile-card dl > div {
+    font-size: 12px;
+  }
+  .annotation-savebar {
+    padding-top: 10px;
+  }
+  .annotation-savebar button {
+    font-size: 11px;
+  }
+  .annotation-savebar > span {
+    font-size: 11px;
+  }
+  .section-title {
+    @apply items-start flex-col;
+  }
+  .section-title > select {
+    @apply w-full;
+    max-width: none;
+  }
+  td,
+  th {
+    padding: 11px;
+    font-size: 12px;
+  }
+  .table-scroll table {
+    min-width: 540px;
+  }
+  .tabs {
+    @apply max-w-full;
+    margin-bottom: 25px;
+  }
+  .tabs button {
+    font-size: 12px;
+    padding: 7px 11px;
+  }
+  .empty {
+    padding: 45px 18px;
+  }
+  .empty h2 {
+    font-size: 16px;
+  }
+  .detail-dialog dl > div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
